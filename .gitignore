@@ -7,3 +7,7 @@
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/QuantitativeFinance.iml
 /.idea/vcs.xml
+*.npy
+*.pkl
+*.db
+*.h5s
