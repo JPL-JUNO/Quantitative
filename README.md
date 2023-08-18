@@ -1,3 +1,3 @@
-# Quantitative Investment Test
+# Quantitative
 
 Contributor(s): Stephen CUI
