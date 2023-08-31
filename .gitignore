@@ -11,3 +11,4 @@
 *.pkl
 *.db
 *.h5s
+__pycache__
