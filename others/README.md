@@ -5,3 +5,5 @@
 3. Distance 提供对距离的测算方式（欧氏距离和曼哈顿距离）
 4. HyperParameter 类提供了对模型的参数调整
 5. KNN 类实现 KNN 算法
+
+[最新版本](https://github.com/JPL-JUNO/Quantitative/tree/main/others)
