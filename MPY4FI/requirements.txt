@@ -1,0 +1,7 @@
+quandl
+numpy
+pandas
+matplotlib
+ipykernel
+mpl_finance
+scipy
