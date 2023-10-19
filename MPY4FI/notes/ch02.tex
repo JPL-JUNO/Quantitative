@@ -1,2 +1,25 @@
 \chapter{金融中的线性问题}
 \section{资本资产定价模型与证券市场线}
+\section{LU 分解}
+LU 分解，也称为上下因子分解（lower upper factorization），是一种线性方程组的求解方法。LU 分解将矩阵 A 分解为两个矩阵的乘积：一个下三角矩阵 L 和一个上三角矩阵 U。分解过程如下所示：
+$$A=LU$$
+
+\begin{equation}
+    \begin{bmatrix}
+        a & b & c \\
+        d & e & f \\
+        g & h & i \\
+    \end{bmatrix}=
+    \begin{bmatrix}
+        l_{11} & 0      & 0      \\
+        l_{21} & l_{22} & 0      \\
+        l_{31} & l_{32} & l_{33} \\
+    \end{bmatrix}
+    \times
+    \begin{bmatrix}
+        u_{11} & u_{12} & u_{13} \\
+        0      & u_{22} & u_{23} \\
+        0      & 0      & u_{33} \\
+    \end{bmatrix}
+\end{equation}
+矩阵 A 中，$a = l_{11}u_{11}$，$b = l_{11}u_{12}$，以此类推。下三角矩阵对角线右上方系数全部为零，相反即为上三角矩阵。LU分解可应用于任意方阵。

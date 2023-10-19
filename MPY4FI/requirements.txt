@@ -5,3 +5,5 @@ matplotlib
 ipykernel
 mpl_finance
 scipy
+statsmodels
+pulp
