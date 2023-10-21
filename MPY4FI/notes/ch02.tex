@@ -23,3 +23,54 @@ $$A=LU$$
     \end{bmatrix}
 \end{equation}
 矩阵 A 中，$a = l_{11}u_{11}$，$b = l_{11}u_{12}$，以此类推。下三角矩阵对角线右上方系数全部为零，相反即为上三角矩阵。LU分解可应用于任意方阵。
+\section{Cholesky 分解}
+Cholesky 分解是利用对称矩阵性质求解线性方程组的方法。与 LU 分解相比，它可以显著提高计算速度并降低对内存的要求。但使用 Cholesky 分解时需要矩阵为埃尔米特矩阵（实值对称矩阵）且正定，即Cholesky分解将矩阵分解为$A = LLT$，其中 $L$ 是对角线为正实数的下三角矩阵，$L^T$ 为 $L$ 的共轭转置矩阵。
+\section{QR 分解}
+QR 分解，又称为 QR 因式分解，和 LU 分解一样是利用矩阵求解线性方程组的方法。QR 分解用于处理 $Ax = B$ 形式的方程，且矩阵 $A = QR$，$Q$ 为正交矩阵，$R$ 为上三角矩阵。QR 算法是线性最小二乘问题的常见解法。
+
+一个正交矩阵具有下列特征：
+\begin{itemize}
+    \item 它是一个方阵。
+    \item 正交矩阵乘以其转置矩阵等于单位矩阵：
+          $QQ^T = Q^TQ = 1$
+    \item 正交矩阵的逆矩阵等于其转置矩阵：
+          $Q^T = Q^{–1}$
+\end{itemize}
+单位矩阵是一个方阵，其主对角线上元素均为 1，其余全为 0。现在将 $Ax = B$ 的问题转化成：
+\begin{equation}
+    \begin{aligned}
+        QRx & = B       \\
+        Rx  & = Q^{–1}B \\
+        Rx  & = Q^TB    \\
+    \end{aligned}
+\end{equation}
+
+\section{使用其他矩阵代数方法求解}
+某些情况下，我们求的解不收敛，可以使用迭代法解决此类问题，如 Jacobi 迭代、Gauss-Seidel 迭代和 SOR 迭代法。
+\subsection{Jacobi 迭代法}
+Jacobi 迭代法通过对矩阵的对角元迭代求解线性方程组，计算结果收敛时终止迭代。方程 $Ax = B$ 中，矩阵 $A = D + R$，矩阵 $D$ 为对角矩阵。
+
+通过迭代得出答案：
+\begin{equation}
+    \begin{aligned}
+        Ax       & = B                \\
+        (D + R)x & = B                \\
+        Dx       & = B – Rx           \\
+        x_{n+1}  & = D^{–1}(B – Rx_n) \\
+    \end{aligned}
+\end{equation}
+与 Gauss-Seidel 迭代法不同，Jacobi 方法欲求 $x_{n+1}$ 必须先求出 $x_n$，这将占用两倍的内存。然而，矩阵中每个元素的计算都以并行方式完成会显著提高运算速度。如果矩阵 A 是一个不可约严格对角占优（strictly irreducibly diagonally dominant）矩 阵，通过 Jacobi 迭代法得到的解一定是收敛的。不可约严格对角占优矩阵是每个对角元的绝对值都大于所在行非对角元绝对值之和的矩阵。
+
+\subsection{Gauss-Seidel 迭代法}
+Gauss-Seidel 迭代法与 Jacobi 迭代法很相似。方程 $Ax = B$ 中，矩阵 $A = L + U$，矩阵 $L$ 为下三角矩阵，矩阵 $U$ 为上三角矩阵。迭代得：
+\begin{equation}
+    \begin{aligned}
+        Ax       & = B                \\
+        (L + U)x & = B                \\
+        Lx       & = B – Ux           \\
+        x_{n+1}  & = L^{–1}(B – Ux_n) \\
+    \end{aligned}
+\end{equation}
+利用下三角矩阵 L 计算 $x_{n+1}$，不必先求出 $x_n$，这相比 Jacobi 迭代法将节省一半的存储空间。
+
+利用 Gauss-Seidel 迭代法求解的收敛速度很大程度取决于矩阵性质，需要严格对角占优或正定矩阵。即使这些条件没有满足，Gauss-Seidel 迭代的结果仍可能收敛。
