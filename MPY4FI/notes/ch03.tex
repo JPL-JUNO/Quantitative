@@ -1,0 +1,59 @@
+\chapter{金融中的非线性问题\label{ch03}}
+金融行业从业者使用非线性模型预测波动性、衍生价格和计算风险价值（Value at Risk，VAR）。与线性模型求解不同，非线性模型不一定推断出全局最优解。数值求根方法通常收敛到最近的局部最优解，即方程只有一个根。
+\section{非线性建模}
+由于非线性研究太过宽泛和深入，本节将简要介绍实际中常用的一些非线性模型：隐含波动率模型、马尔可夫转换模型（Markov switching model）、门限模型（threshold model）和平滑转换模型（smooth transition model）。
+
+\subsection{隐含波动率模型}
+最常见的期权定价模型应该是布莱克–斯克尔斯–默顿期权定价模型（Black-Scholes-Merton model），简称为布莱克–斯克尔斯模型。布莱克–斯克尔斯模型假设证券收益服从正态分布，或证
+券价格服从对数正态分布，从而计算期权平价。
+
+该模型采用以下假设变量：行权价格（$K$）、到期日（$T$）、无风险利率（$r$）、潜在收益波动率（$\sigma$）、标的资产当前价格（$S$）、收益（$q$）。看涨期权的数学公式 $C(S, t)$ 表示为：
+\begin{equation}
+    C(S, t) = Se^{qT}N(d_1) – Ke^{–rT}N(d_2)
+\end{equation}
+上式中：
+\begin{equation*}
+    d_1=\frac{\ln(S/K)+(r-q+\sigma^2)T}{\sigma\sqrt{T}}
+\end{equation*}
+由于市场调节作用，期权价格可能与布莱克–斯克尔斯模型计算结果有偏差。特别地，实际波动率（即通过历史市场价格得到的标的收益波动性）可能与该模型采用的波动率 $\sigma$ 不一致。随着波动率在证券定价中的重要性日渐提高，诸多波动率模型被提出，隐含波动率模型即其中之一。
+\subsection{马尔可夫机制转换模型}
+马尔可夫机制转换模型（Markov regime-switching model）又称为马尔可夫转换模型，用于金融时间序列的非线性模型构造，可在不同机制状态下描述时间序列。
+\subsection{门限自回归模型}
+与马尔可夫机制转换模型十分相似的门限自回归模型（Threshold Autoregressive Model，TAR）是用于解释非线性时间序列问题最常见的自回归模型。使用回归方法，简单的 AR 模型可以说是解释非线性行为的最流行模型。该门限模型的机制由时间序列过去的 d 值确定，与阈值 c 有关。
+
+下面是自激励门限自回归（SelfExciting TAR，SETAR）模型的示例。自激励门限自回归模型可根据以往时间序列取值在不同机制间转换。
+\begin{equation}
+    y_t = \begin{cases}
+        a_1+b_1y_{t-d}+\epsilon_t, & y_{t-d}\leq c \\
+        a_2+b_1y_{t-d}+\epsilon_t, & y_{t-d}\geq c \\
+    \end{cases}
+\end{equation}
+\subsection{平滑转换模型}
+机制状态的快速转换在现实世界中不可能发生，因此我们要引入一个平滑连续函数。通过逻辑函数 $G(y_{t–1}; \gamma, c)$，自激励门限自回归模型就变为逻辑平滑转换门限自回归（Logistic Smooth Transition Threshold Autoregressive，LSTAR）模型：
+\begin{equation}
+    G(y_{t–1}; \gamma, c)=\frac{1}{1+\exp\{-\gamma(y_{t-d}-c)\}}
+\end{equation}
+自激励门限自回归模型变为逻辑平滑转换门限自回归，后者可表示为：
+\begin{equation}
+    y_t = (a_1 + b_1y_{t–d})(1 – G(y_{t–1}; \gamma, c)) + (a_2 + b_2y_{t–d})G(y_{t–1}; \gamma , c) + \epsilon_t
+\end{equation}
+上式中，参数 $\gamma$ 控制机制状态的转变。$\gamma$ 越大，转换越快，且 $y_{t–d}$越靠近阈值 $c$。$\gamma  = 0$ 时逻辑平滑转换门限自回归模型相当于一个简单的单机制自回归模型。
+\section{非线性模型求根算法}
+\subsection{增量法}
+增量法（incremental search）是求解非线性函数的简略方法。对于任意起点 $a$，可以针对每个增量 $dx$ 得到$f(a)$ 的值。假定对于增量 $dx$，$f(a + dx)$、$f(a + 2dx)$、$f(a + 3dx)\dots$ 的符号相同。函数值符号改变时得到解，迭代结束；如果超过边界点 $b$ 没有得到合适解，迭代也结束。
+\subsection{二分法}
+二分法最大的优势为在给定的迭代次数和允许误差内，一定可以收敛得到根的近似解。某些连续函数求导尤为复杂，而二分法不要求对未知函数求导，处理非平滑函数时非常有效。
+
+与其他求根方法相比，二分法主要的缺陷为迭代时间更长。由于二分法的求根范围在a与b之间，因此需要准确估测根的位置，否则可能会得到错误的解甚至无解。采用更大范围的区间，所需迭代时间更长。
+
+二分法可以稳定收敛且初始无须估计近似根，通常将其结合其他方法使用，例如牛顿迭代法，更快速地获得精确结果。
+\subsection{牛顿法}
+\subsection{割线法}
+\section{利用 SciPy 求根}
+\subsection{通用非线性求解器}
+scipy.optimize 模块还包含多维通用求解器，其中 root 和 fsolve 函数具有如下特征：
+\begin{enumerate}
+    \item \verb|root(fun, x0[, args, method, jac, tol, ...])|：求一个向量函数的根。
+    \item \verb|fsolve(func, x0[, args, fprime, ...])|：求一个函数的根。
+\end{enumerate}
+返回的输出作为字典对象。
