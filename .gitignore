@@ -16,3 +16,4 @@ MPY4FI/code/token.txt
 *.aux
 *.log
 *.synctex.gz
+*.out
