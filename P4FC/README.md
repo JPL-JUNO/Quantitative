@@ -1,4 +1,4 @@
-# Python for Finance Cookbook, 2nd
+# [Python for Finance Cookbook, 2nd](https://www.packtpub.com/product/python-for-finance-cookbook-second-edition/9781803243191)
 
 ## 获取数据
 
@@ -8,7 +8,7 @@
 - Getting data from Alpha Vantage
 - Getting data from CoinGecko
 
-[Chapter01]() 提供了多种下载金额数据的方法，Yahoo Finance 与 [Alpha Vantage](https://www.alphavantage.co/support/#api-key) 是不错的选择，其中 Alpha Vantage 需要先填写一些基本信息获取 API Token。 [CoinGecko](https://github.com/man-c/pycoingecko) 是获取加密货币不错的 package。
+[Chapter01](https://github.com/JPL-JUNO/Quantitative/blob/main/P4FC/code/ch01_acquiring_financial_data.ipynb) 提供了多种下载金额数据的方法，Yahoo Finance 与 [Alpha Vantage](https://www.alphavantage.co/support/#api-key) 是不错的选择，其中 Alpha Vantage 需要先填写一些基本信息获取 API Token。 [CoinGecko](https://github.com/man-c/pycoingecko) 是获取加密货币不错的 package。
 
 ### 其他可选的数据源
 
