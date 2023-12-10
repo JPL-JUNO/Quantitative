@@ -1,0 +1,36 @@
+\chapter{Data Preprocessing\label{ch02}}
+\section{Changing the frequency of time series data}
+The formula for realized volatility is as follows:
+\begin{equation}
+    RV=\sqrt{\sum_{i=1}^{T}r_t^2}
+\end{equation}
+Realized volatility is frequently used for calculating the daily volatility using intraday returns.
+\section{Different ways of imputing missing data}
+Two of the simplest approaches to imputing missing time series data are:
+\begin{itemize}
+    \item Backward filling—fill the missing value with the next known value
+    \item Forward filling—fill the missing value with the previous known value
+\end{itemize}
+\section{Different ways of aggregating trade data}
+The term \textbf{bars} refers to a data representation that contains basic information about the price movements of any financial asset.
+
+冰山订单是大订单被分成较小的限价订单以隐藏实际订单数量。 它们被称为“冰山订单”，因为可见的订单只是“冰山一角”，而大量的限价订单正在等待，准备下单。
+
+Ideally, they would want to have a bar representation in which each bar contains the same amount of information. Some of the alternatives they are using include:
+\begin{itemize}
+    \item \textbf{Tick bars}—named after the fact that transactions/trades in financial markets are often referred to as ticks. For this kind of aggregation, we sample an OHLCV bar every time a predefined number of transactions occurs.
+    \item \textbf{Volume bars}—we sample a bar every time a predefined volume (measured in any unit, for example, shares, coins, etc.) is exchanged.
+    \item \textbf{Dollar bars}—we sample a bar every time a predefined dollar amount is exchanged. Naturally, we can use any other currency of choice.
+\end{itemize}
+
+"Tick bars" 在金融领域通常指的是一种按照市场价格变动（ticks）来形成的交易条形图或时间序列。这种图表以市场价格的变动为基础，而不是固定的时间间隔。当市场价格变动达到一定的数量（例如，每次价格变动一个tick），就形成一个新的交易条。
+
+这种方法的优势在于，它可以更好地反映市场的活动和波动，而不受时间因素的影响。相比于固定时间间隔的图表，tick bars 可以更好地捕捉市场的高活跃性时段，提供更精确的信息，尤其对于高频交易者和对市场活动敏感的策略来说更为有用。
+
+Each of these forms of aggregations has its strengths and weaknesses that we should be aware of.
+
+Tick bars offer a better way of tracking the actual activity in the market, together with the volatility. However, a potential issue arises out of the fact that one trade can contain any number of units of a certain asset. So, a buy order of a single share is treated equally to an order of 10,000 shares.
+
+Volume bars are an attempt at overcoming this problem. However, they come with an issue of their own. They do not correctly reflect situations in which asset prices change significantly or when stock splits happen. This makes them unreliable for comparison between periods affected by such situations.
+
+That is where the third type of bar comes into play—the dollar bars. It is often considered the most robust way of aggregating price data. Firstly, the dollar bars help bridge the gap with price volatility, which is especially important for highly volatile markets such as cryptocurrencies. Then, sampling by dollars is helpful to preserve the consistency of information. The second reason is that dollar bars are resistant to the outstanding amount of the security, so they are not affected by actions such as stock splits, corporate buybacks, issuance of new shares, and so on.

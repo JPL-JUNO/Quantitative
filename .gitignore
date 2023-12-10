@@ -18,3 +18,4 @@ MPY4FI/code/token.txt
 *.synctex.gz
 *.out
 token
+*.toc
