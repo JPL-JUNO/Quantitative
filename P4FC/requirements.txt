@@ -5,3 +5,4 @@ bokeh==2.3.4
 cufflinks
 pandas_bokeh
 mplfinance
+sktime
