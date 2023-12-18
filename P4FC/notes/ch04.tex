@@ -9,3 +9,25 @@ In this chapter, we will cover the following recipes:
     \item Investigating stylized facts of asset returns
 \end{itemize}
 \section{Outlier detection using rolling statistics}
+
+\section{Outlier detection with the Hampel filter}
+We will cover one more algorithm used for outlier detection in time series—the Hampel filter. Its goal is to identify and potentially replace outliers in a given series. It uses a centered sliding window of size $2x$ (given $x$ observations before/after) to go over the entire series.
+
+For each of the sliding windows, the algorithm calculates the median and the median absolute deviation (a form of a standard deviation).
+
+\begin{tcolorbox}
+    For the median absolute deviation to be a consistent estimator for the standard deviation, we have to multiply it by a constant scaling factor $k$, which is dependent on the distribution. For Gaussian, it is approximately 1.4826.
+\end{tcolorbox}
+
+\section{Detecting changepoints in time series}
+A \textbf{changepoint} can be defined as a point in time when the probability distribution of a process or time series changes, for example, when there is a change to the mean in the series.
+
+\section{检验资产收益的程式化事实}
+\subsection{事实 1：Non-Gaussian distribution of returns}
+\subsection{事实 2：波动性聚类}
+波动性聚类是一种模式，其中价格的大变化往往会伴随着大的变化（波动性较高的时期），而价格的小变化之后往往会出现小的变化（波动性较低的时期）。
+\subsection{事实 3：收益率缺乏自相关性}
+\subsection{事实 4：平方/绝对回报的自相关性较小且递减}
+While we expect no autocorrelation in the return series, it was empirically proven that we can observe small and slowly decaying autocorrelation (also referred to as persistence) in simple nonlinear functions of the returns, such as absolute or squared returns. This observation is connected to the phenomenon we have already investigated, that is, volatility clustering.
+\subsection{Fact 5: Leverage effect}
+The leverage effect refers to the fact that most measures of an asset’s volatility are negatively correlated with its returns.
