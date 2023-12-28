@@ -1,0 +1,33 @@
+\chapter{Time Series Analysis and Forecasting\label{ch06}}
+\section{Time series decomposition}
+The components of time series can be divided into two types: systematic and non-systematic. The
+systematic ones are characterized by consistency and the fact that they can be described and modeled.
+By contrast, the non-systematic ones cannot be modeled directly.
+The following are the systematic components:
+\begin{itemize}
+    \item \textbf{Level}—the mean value in the series.
+    \item \textbf{Trend}—an estimate of the trend, that is, the change in value between successive time points at any given moment. It can be associated with the slope (increasing/decreasing) of the series. In other words, it is the general direction of the time series over a long period of time.
+    \item \textbf{Seasonality}—deviations from the mean caused by repeating short-term cycles (with fixed and
+          known periods).
+\end{itemize}
+The following is the non-systematic component:
+\begin{itemize}
+    \item \textbf{Noise}—the random variation in the series. It consists of all the fluctuations that are observed after removing other components from the time series.
+\end{itemize}
+The classical approach to time series decomposition is usually carried out using one of two types of models: additive and multiplicative.
+
+An \textbf{additive model} can be described by the following characteristics:
+\begin{itemize}
+    \item Model's form—$y(t) = level + trend + seasonality + noise$
+    \item Linear model—changes over time are consistent in size
+    \item The trend is linear (straight line)
+    \item Linear seasonality with the same frequency (width) and amplitude (height) of cycles over time
+\end{itemize}
+
+A \textbf{multiplicative model} can be described by the following characteristics:
+\begin{itemize}
+    \item Model's form—$y(t) = level * trend * seasonality * noise$
+    \item Non-linear model—changes over time are not consistent in size, for example, exponential
+    \item A curved, non-linear trend
+    \item Non-linear seasonality with increasing/decreasing frequency and amplitude of cycles over time
+\end{itemize}
