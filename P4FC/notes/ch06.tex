@@ -31,3 +31,6 @@ A \textbf{multiplicative model} can be described by the following characteristic
     \item A curved, non-linear trend
     \item Non-linear seasonality with increasing/decreasing frequency and amplitude of cycles over time
 \end{itemize}
+
+Hodrick-Prescott 滤波器——虽然这种方法并不是真正的季节性分解方法，但它是一种数据平滑技术，用于消除与经济周期相关的短期波动。 通过消除这些，我们可以揭示长期趋势。 HP 滤波器常用于宏观经济学。 您可以在 \verb|statsmodels| 的 \verb|hpfilter| 函数中找到它的实现。
+
