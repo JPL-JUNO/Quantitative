@@ -41,7 +41,7 @@ def adf_test(x: Union[Series, ndarray]) -> Series:
     """
     indices = ['Test Statistic', 'p-value',
                '# of Lags Used', '# of Observations Used']
-    adf_test = adfuller(x, autolags='AIC')
+    adf_test = adfuller(x, autolag='AIC')
     results = pd.Series(adf_test[0:4], index=indices)
 
     for key, value in adf_test[4].items():
