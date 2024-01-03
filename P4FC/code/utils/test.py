@@ -15,6 +15,7 @@ from statsmodels.tools.sm_exceptions import InterpolationWarning
 from pandas import Series
 from numpy import ndarray
 from matplotlib.figure import Figure
+from typing import Union
 
 import warnings
 
@@ -22,7 +23,7 @@ warnings.simplefilter(action='ignore', category=InterpolationWarning)
 warnings.filterwarnings('ignore', '.*output shape of zoom.*')
 
 
-def adf_test(x: Series | ndarray) -> Series:
+def adf_test(x: Union[Series, ndarray]) -> Series:
     """Function for performing the Augmented Dickey-Fuller test for stationary
 
     Null Hypothesis: time series is not stationary
@@ -49,7 +50,7 @@ def adf_test(x: Series | ndarray) -> Series:
     return results
 
 
-def kpss_test(x: Series | ndarray, h0_type: str = 'c') -> Series:
+def kpss_test(x: Union[Series, ndarray], h0_type: str = 'c') -> Series:
     """Function for performing the Kwiatkowski-Phillips-Schmidt-Shin test for stationarity
 
     Null Hypothesis: time series is stationary
@@ -78,7 +79,7 @@ def kpss_test(x: Series | ndarray, h0_type: str = 'c') -> Series:
     return results
 
 
-def test_autocorrelation(x: Series | ndarray,
+def test_autocorrelation(x: Union[Series, ndarray],
                          n_lags: int = 40, alpha: float = .05, h0_type: str = 'c') -> Figure:
     """Function for testing the stationary of a series by using
     - the ADF test
@@ -117,3 +118,7 @@ def test_autocorrelation(x: Series | ndarray,
     plot_pacf(x, ax=ax[1], lags=n_lags, alpha=alpha)
 
     return fig
+
+
+if __name__ == '__main__':
+    kpss_test()
