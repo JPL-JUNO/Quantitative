@@ -34,3 +34,14 @@ A \textbf{multiplicative model} can be described by the following characteristic
 
 Hodrick-Prescott 滤波器——虽然这种方法并不是真正的季节性分解方法，但它是一种数据平滑技术，用于消除与经济周期相关的短期波动。 通过消除这些，我们可以揭示长期趋势。 HP 滤波器常用于宏观经济学。 您可以在 \verb|statsmodels| 的 \verb|hpfilter| 函数中找到它的实现。
 
+\section{Testing for stationarity in time series}
+时间序列分析中最重要的概念之一是平稳性（stationarity）。 简单地说，平稳时间序列是一个属性不依赖于观察该序列的时间的序列。 换句话说，平稳性意味着某个时间序列的数据生成过程（data-generating process, DGP）的统计特性不随时间变化。
+
+更正式地说，平稳性有多种定义，其中一些定义比其他定义更严格。 对于实际用例，我们可以使用一种称为弱平稳性（或协方差平稳性）的方法。 对于要归类为（协方差）平稳的时间序列，它必须满足以下三个条件：
+\begin{itemize}
+    \item 系列的平均值必须恒定
+    \item 系列的方差必须是有限且恒定的
+    \item 相同距离的周期之间的协方差必须恒定
+\end{itemize}
+
+ADF 和 KPSS 检验的一个潜在缺点是它们不允许结构中断的可能性，即数据生成过程的平均值或其他参数的突然变化。 Zivot-Andrews 测试允许该系列中出现单一结构断裂的可能性，但其发生时间未知。
