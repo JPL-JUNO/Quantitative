@@ -6,3 +6,5 @@ cufflinks
 pandas_bokeh
 mplfinance
 sktime
+cpi
+pmdarima
