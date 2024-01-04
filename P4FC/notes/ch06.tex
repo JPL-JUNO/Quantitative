@@ -45,3 +45,24 @@ Hodrick-Prescott 滤波器——虽然这种方法并不是真正的季节性分
 \end{itemize}
 
 ADF 和 KPSS 检验的一个潜在缺点是它们不允许结构中断的可能性，即数据生成过程的平均值或其他参数的突然变化。 Zivot-Andrews 测试允许该系列中出现单一结构断裂的可能性，但其发生时间未知。
+\section{使用指数平滑方法对时间序列建模}
+
+\textbf{指数平滑方法}是经典预测模型的两大家族之一。 他们的基本思想是，预测只是过去观察结果的加权平均值。 在计算这些平均值时，更多地关注最近的观察结果。 为了实现这一目标，权重随着时间呈指数衰减。 这些模型适用于非平稳数据，即具有趋势和/或季节性的数据。 平滑方法很受欢迎，因为它们速度快（不需要大量计算）并且在预测准确性方面相对可靠。
+
+总的来说，指数平滑方法可以根据 ETS 框架（误差 error、趋势 trend 和季节 season）进行定义，因为它们结合了平滑计算中的基础组件。 与季节分解的情况一样，这些项可以加法、乘法组合，或者简单地从模型中排除。
+
+最简单的模型称为简单指数平滑 (SES, simple exponential smoothing)。 此类模型最适合所考虑的时间序列不表现出任何趋势或季节性的情况。 它们也适用于只有几个数据点的系列。 该模型由值在 0 到 1 之间的平滑参数 $\alpha$ 进行参数化。越高值越大，最近的观察结果就越受重视。 当 $\alpha = 0$ 时，对未来的预测等于训练数据的平均值。 当 $\alpha = 1$时，所有预测值与训练集中上一次预测值相同。
+
+使用 SES 生成的预测是平坦的，也就是说，无论时间范围如何，所有预测都具有相同的值（对应于最后一个级别的组件）。 这就是为什么这种方法只适用于既没有趋势也没有季节性的序列。
+
+霍尔特线性趋势法（Holt's linear trend method）（也称为霍尔特双指数平滑法（Holt's double exponential smoothing method））是 SES 的扩展，通过将趋势分量添加到模型规范中来解释序列中的趋势。 因此，当数据存在趋势时应该使用该模型，但它仍然无法处理季节性。
+
+霍尔特模型的一个问题是趋势在未来是恒定的，这意味着它会无限期地增加/减少。 这就是为什么模型的扩展通过添加阻尼参数 $\phi$ 来抑制趋势。 它使趋势在未来收敛到一个恒定值，有效地将其压平。
+
+\begin{tcolorbox}
+    $\phi$ is rarely smaller than 0.8, as the dampening has a very strong effect for smaller values of $\phi$ . The best practice is to restrict the values of $\phi$ so that they lie between 0.8 and 0.98. For $\phi = 1$ the damped model is equivalent to the model without dampening.
+\end{tcolorbox}
+
+最后，我们将介绍霍尔特方法的扩展，称为霍尔特-温特斯季节性平滑（Holt-Winters' seasonal smoothing）（也称为霍尔特-温特斯三重指数平滑，Holt-Winters' triple exponential smoothing）。 顾名思义，它解释了时间序列中的季节性。 无需赘述，该方法最适合具有以下特征的数据：趋势和季节性。
+
+该模型有两种变体，它们具有加性或乘性季节性。 在前一种情况下，季节性变化在整个时间序列中或多或少是恒定的。 在后一种情况下，变化随着时间的推移而发生变化。
