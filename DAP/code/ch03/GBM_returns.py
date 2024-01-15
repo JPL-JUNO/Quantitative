@@ -34,7 +34,7 @@ def dN(x: float, mu: float, sigma: float) -> float:
         value of probability density function
     """
     z = (x - mu) / sigma
-    pdf = np.exp(-0.5 * z ** 2) / math.sqrt(z * math.pi * sigma ** 2)
+    pdf = np.exp(-0.5 * z ** 2) / math.sqrt(2 * math.pi * sigma ** 2)
     return pdf
 
 
@@ -95,8 +95,8 @@ def print_statistics(data: DataFrame) -> None:
     print(f"Realized Variance {data['rea_var'].iloc[-1]:9.6f}")
 
 
-def quotes_returns(data: DataFrame):
-    fig, ax = plt.subplots(2, 1, figsize=(9, 6), sharex=True)
+def quotes_returns(data: DataFrame) -> None:
+    _, ax = plt.subplots(2, 1, figsize=(9, 6), sharex=True)
     data['index'].plot(ax=ax[0], grid=True)
     ax[0].set_ylabel('daily quotes')
 
@@ -105,3 +105,20 @@ def quotes_returns(data: DataFrame):
 
     plt.grid(True)
     plt.tight_layout()
+
+
+def return_histogram(data: DataFrame) -> None:
+    _, ax = plt.subplots(1, figsize=(9, 5))
+    x = np.linspace(min(data['returns']),
+                    max(data['returns']), 100)
+    ax.hist(np.array(data['returns']), bins=50, density=True)
+    y = dN(x, np.mean(data['returns']), np.std(data['returns']))
+    ax.plot(x, y, linewidth=2)
+    plt.xlabel('log returns')
+    plt.ylabel('frequency/probability')
+    plt.grid(True)
+
+
+if __name__ == '__main__':
+    gbm = simulate_gbm()
+    return_histogram(gbm)
