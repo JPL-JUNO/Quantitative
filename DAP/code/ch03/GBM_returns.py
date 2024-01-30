@@ -40,7 +40,7 @@ def dN(x: float, mu: float, sigma: float) -> float:
 
 def simulate_gbm() -> DataFrame:
     S0 = 100.0
-    T = 10.0
+    # T = 10.0
     r = .05
     vol = .2
 
@@ -51,7 +51,7 @@ def simulate_gbm() -> DataFrame:
     M = len(gbm_dates)
     I = 1
     dt = 1 / 252.  # 简化：固定时间间隔
-    discount_factor = math.exp(-r * dt)  # 折现因子
+    # discount_factor = math.exp(-r * dt)  # 折现因子
 
     rand = np.random.standard_normal((M, I))  # 生成随机数
 
@@ -87,10 +87,15 @@ def print_statistics(data: DataFrame) -> None:
     print(f"Skew Normal Test p-value {scs.skewtest(data['returns'])[1]:9.6f}")
 
     print(50 * '-')
+
     print(f"Kurt of Sample Log Returns {scs.kurtosis(data['returns']):9.6f}")
     print(
         f"Kurt Normal Test p-value {scs.kurtosistest(data['returns'])[1]:9.6f}")
+
     print(50 * '-')
+    print(f"Normal Test p-value {scs.normaltest(data['returns'])[1]:9.6f}")
+    print(50 * '-')
+
     print(f"Realized Volatility {data['rea_vol'].iloc[-1]:9.6f}")
     print(f"Realized Variance {data['rea_var'].iloc[-1]:9.6f}")
 
@@ -119,6 +124,49 @@ def return_histogram(data: DataFrame) -> None:
     plt.grid(True)
 
 
+def return_qqplot(data: DataFrame) -> None:
+    _, ax = plt.subplots(figsize=(9, 5))
+    sm.qqplot(data['returns'], line='s', ax=ax)
+    plt.grid(True)
+    ax.set_xlabel('theoretical quantiles')
+    ax.set_ylabel('sample quantiles')
+
+
+def realized_volatility(data: DataFrame) -> None:
+    _, ax = plt.subplots(figsize=(9, 5))
+    data['rea_vol'].plot(ax=ax, grid=True)
+    ax.set_ylabel('realized volatility')
+
+
+def rolling_statistics(data: DataFrame):
+    _, axes = plt.subplots(3, 1, sharex=True, figsize=(11, 8))
+    mr = data['returns'].rolling(window=252).mean() * 252
+    mr.plot(ax=axes[0], grid=True)
+    axes[0].set_ylabel('returns (252d)')
+    axes[0].axhline(mr.mean(), color='r', ls='dashed', lw=1.5)
+
+    vo = data['returns'].rolling(window=252).std() * math.sqrt(252)
+    vo.plot(ax=axes[1], grid=True)
+    axes[1].set_ylabel('volatility (252d)')
+    axes[1].axhline(vo.mean(), color='r', ls='dashed', lw=1.5)
+
+    co = mr.rolling(window=252).corr(vo)  # 这将少掉两年的数据
+    co.plot(ax=axes[2], grid=True)
+    axes[2].set_ylabel('correlation (252d)')
+    axes[2].axhline(co.mean(), color='r', ls='dashed', lw=1.5)
+
+
+def do_analysis(data):
+    print_statistics(data)
+
+    quotes_returns(data)
+    return_histogram(data)
+    return_qqplot(data)
+
+    realized_volatility(data)
+    rolling_statistics(data)
+
+
 if __name__ == '__main__':
     gbm = simulate_gbm()
-    return_histogram(gbm)
+    do_analysis(gbm)
