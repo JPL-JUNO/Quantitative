@@ -4,7 +4,7 @@
 @LastEditor(s): Stephen CUI
 @CreatedTime  : 2024-02-24 20:54:06
 @Email        : cuixuanstephen@gmail.com
-@Description  : 
+@Description  : 金融基本概念
 """
 
 import streamlit as st
