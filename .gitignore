@@ -20,3 +20,5 @@ MPY4FI/code/token.txt
 token
 *.toc
 MFPR/account.ini
+rename.py
+draft.*
