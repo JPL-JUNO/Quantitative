@@ -160,7 +160,6 @@ ax.plot([idx_max_dropdown_cumsum], [df.iloc[idx_max_dropdown_cumsum]["cumsum"]],
 ax.plot([idx_max_dropdown], [df.iloc[idx_max_dropdown]["cumsum"]], "g^")
 ax.set_ylim(df["cumsum"].min() * 0.95, 1.05 * df["cumsum"].max())
 ax.set_title(f"Max Dropdown={max_dropdown:.4}%")
-plt.show()
 with tabs[7]:
     st.markdown(
         """
