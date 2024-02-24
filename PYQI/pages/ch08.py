@@ -8,6 +8,9 @@
 """
 
 import streamlit as st
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 st.set_page_config(
     page_title="金融基本概念",
@@ -129,6 +132,35 @@ with tabs[6]:
         阿尔法策略，其实是来源于资本资产定价模型（CAPM）。这个模型将股票的收益分为了两个部分，一部分是由大盘涨跌带来的，另一部分则是由股票自身的特性带来的。大盘的那部分影响就是贝塔（Beta）值，剔除大盘的影响，剩下的股票自身就是 Alpha 值。在谈论 Alpha 策略的时候，其实就是在谈论股票与大盘无关的那部分超额收益。如果 Alpha 策略做得好，对冲掉大盘风险后，可以取得相当稳定的收益。
     """
     )
+# 生成一些工作日（假设为交易日）以及收益率
+df = pd.DataFrame(
+    {
+        "trade_date": pd.date_range("2023-01-01", "2024-02-24", freq="B"),
+        "rtn": np.random.standard_normal(size=300) / 100,
+    }
+)
+# 计算累积收益率
+df["cumsum"] = 1 + df["rtn"].cumsum()
+df["cummax"] = df["cumsum"].cummax()
+max_dropdown = np.max(1 - df["cumsum"] / df["cummax"]) * 100
+df["dropdown"] = 1 - df["cumsum"] / df["cummax"]
+fig, ax = plt.subplots()
+df[["cumsum", "cummax"]].plot(ax=ax)
+idx_max_dropdown = df["dropdown"].idxmax()
+idx_max_dropdown_cumsum = df.iloc[:idx_max_dropdown]["cumsum"].idxmax()
+
+ax.annotate(
+    text="max",
+    xy=(idx_max_dropdown_cumsum, df.iloc[idx_max_dropdown_cumsum]["cumsum"] * 1.01),
+)
+ax.annotate(
+    text="min", xy=(idx_max_dropdown, df.iloc[idx_max_dropdown]["cumsum"] * 0.98)
+)
+ax.plot([idx_max_dropdown_cumsum], [df.iloc[idx_max_dropdown_cumsum]["cumsum"]], "rv")
+ax.plot([idx_max_dropdown], [df.iloc[idx_max_dropdown]["cumsum"]], "g^")
+ax.set_ylim(df["cumsum"].min() * 0.95, 1.05 * df["cumsum"].max())
+ax.set_title(f"Max Dropdown={max_dropdown:.4}%")
+plt.show()
 with tabs[7]:
     st.markdown(
         """
@@ -140,7 +172,4 @@ with tabs[7]:
         \max\left(1-\frac{\text{当日累积收益}}{当前累积收益最大值}\right)
     """
     )
-    st.markdown(
-        """
-    """
-    )
+    st.pyplot(fig)
