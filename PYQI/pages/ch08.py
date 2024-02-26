@@ -14,11 +14,6 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(
     page_title="金融基本概念",
-    menu_items={
-        "Get Help": "https://www.extremelycoolapp.com/help",
-        "Report a bug": "https://www.extremelycoolapp.com/bug",
-        "About": "# This is a header. This is an *extremely* cool app!",
-    },
 )
 st.title("金融基本概念")
 st.subheader("Stephen CUI")
