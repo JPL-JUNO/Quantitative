@@ -16,3 +16,9 @@ MPY4FI/code/token.txt
 *.aux
 *.log
 *.synctex.gz
+*.out
+token
+*.toc
+MFPR/account.ini
+rename.py
+draft.*

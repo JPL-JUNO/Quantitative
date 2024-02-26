@@ -1,0 +1,15 @@
+\chapter{布莱克-斯科尔斯-默顿模型}
+
+\begin{equation}
+    \label{eq15-1}
+    \frac{\Delta S}{S}\sim N(\mu\Delta t, \sigma^2\Delta t)
+\end{equation}
+
+\begin{equation}
+    \label{eq15-7}
+    x\sim N(\mu-\frac{\sigma^2}{2}, \frac{\sigma^2}{T})
+\end{equation}
+\section{波动率}
+由 \autoref{eq15-7} 可知股票价格的波动率可以定义成按连续复利时股票在 1 年内所提供收益率的标准差。（这里就是在 \autoref{eq15-7} 中令 $T = 1$，那么股票的的连续复利收益率的方差就是波动率）
+
+当 $\Delta t$ 很小时，\autoref{eq15-1} 显示 $\sigma^2\Delta t$ 近似地等于在 $\Delta t$ 时间内股票价格变化百分比的方差。这说明近似地等于在 $\Delta t$ 时间内股票价格变化百分比的标准差。

@@ -1,0 +1,43 @@
+\chapter{Algorithmic Mindset and Functions\label{ch02}}
+\section{Coding Performance Evaluation Functions}
+\subsection{The Hit Ratio}
+The hit ratio in trading jargon is the number of past profitable trades divided by the total number of realized past trades. This means that the hit ratio measures the percentage of when you were right about the future direction.
+
+\begin{equation}
+    \text{Hit ratio} = \frac{\text{Number of profitable trades}}{\text{Number of total trades}}
+\end{equation}
+
+\subsection{The Rate of Return}
+\begin{equation}
+    \text{Rate of return}=\frac{\text{New balance}}{\text{Initial balance }}-1
+\end{equation}
+
+You can also calculate several types of returns, namely, the \textit{gross} rate of return and the \textit{net} rate of return. Surely what should interest you is the latter as it is net of fees.
+
+\begin{tcolorbox}
+    Some portfolios switch from winners to losers after removing the costs, which is why it is important to choose a broker with an acceptable fee structure so that it does not eat away your profits over time. Even small differences in commissions can have a huge impact on active traders.
+\end{tcolorbox}
+
+\subsection{The Profit Factor}
+The \textit{profit factor} is a quick measure to see how much you are winning for every 1 currency unit of loss. It is calculated as the ratio between gross overall profit and gross overall loss, meaning that you divide the sum of the profits from all profitable trades by the sum of the losses from all losing trades. Mathematically, it is expressed as follows:
+
+\begin{equation}
+    \text{Profit factor}=\frac{\text{Gross total profit}}{|\text{Gross total loss}|}
+\end{equation}
+\subsection{The Risk-Reward Ratio}
+\begin{equation}
+    \text{Risk reward ratio }=\frac{|\text{Entry price - Target price}|}{|\text{Entry price - Stop price}|}
+\end{equation}
+
+The break-even hit ratio is the minimum hit ratio needed to achieve zero profit and loss, excluding costs and fees. As it is just an indicative measure, the break-even hit ratio is rarely presented in performance reports. However, you can easily calculate it through the risk-reward ratio like this:
+\begin{equation}
+    \text{Break-even hit ratio} =\frac{1}{1 + \text{Risk reward ratio}}
+\end{equation}
+
+In reality, some trades can be closed before getting stopped out or before seeing their targets, and this is due to various reasons, like getting another signal in the same direction. Therefore, you have two different risk-reward ratios:
+\begin{description}
+    \item[The theoretical risk-reward ratio] This is generally set before the trade and is a forecast.
+    \item[The realized risk-reward ratio] This is the average profit per trade divided by the average loss per trade, which gives an idea of how close you are to your theoretical risk-reward ratio.
+\end{description}
+\subsection{The Number of Trades}
+The frequency of trades is important for performance evaluation. A rule of thumb to keep in mind is to have at least 30 trades in order to meet the minimum threshold for reliability.

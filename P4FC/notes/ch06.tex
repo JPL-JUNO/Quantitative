@@ -1,0 +1,68 @@
+\chapter{Time Series Analysis and Forecasting\label{ch06}}
+\section{Time series decomposition}
+The components of time series can be divided into two types: systematic and non-systematic. The
+systematic ones are characterized by consistency and the fact that they can be described and modeled.
+By contrast, the non-systematic ones cannot be modeled directly.
+The following are the systematic components:
+\begin{itemize}
+    \item \textbf{Level}—the mean value in the series.
+    \item \textbf{Trend}—an estimate of the trend, that is, the change in value between successive time points at any given moment. It can be associated with the slope (increasing/decreasing) of the series. In other words, it is the general direction of the time series over a long period of time.
+    \item \textbf{Seasonality}—deviations from the mean caused by repeating short-term cycles (with fixed and
+          known periods).
+\end{itemize}
+The following is the non-systematic component:
+\begin{itemize}
+    \item \textbf{Noise}—the random variation in the series. It consists of all the fluctuations that are observed after removing other components from the time series.
+\end{itemize}
+The classical approach to time series decomposition is usually carried out using one of two types of models: additive and multiplicative.
+
+An \textbf{additive model} can be described by the following characteristics:
+\begin{itemize}
+    \item Model's form—$y(t) = level + trend + seasonality + noise$
+    \item Linear model—changes over time are consistent in size
+    \item The trend is linear (straight line)
+    \item Linear seasonality with the same frequency (width) and amplitude (height) of cycles over time
+\end{itemize}
+
+A \textbf{multiplicative model} can be described by the following characteristics:
+\begin{itemize}
+    \item Model's form—$y(t) = level * trend * seasonality * noise$
+    \item Non-linear model—changes over time are not consistent in size, for example, exponential
+    \item A curved, non-linear trend
+    \item Non-linear seasonality with increasing/decreasing frequency and amplitude of cycles over time
+\end{itemize}
+
+Hodrick-Prescott 滤波器——虽然这种方法并不是真正的季节性分解方法，但它是一种数据平滑技术，用于消除与经济周期相关的短期波动。 通过消除这些，我们可以揭示长期趋势。 HP 滤波器常用于宏观经济学。 您可以在 \verb|statsmodels| 的 \verb|hpfilter| 函数中找到它的实现。
+
+\section{Testing for stationarity in time series}
+时间序列分析中最重要的概念之一是平稳性（stationarity）。 简单地说，平稳时间序列是一个属性不依赖于观察该序列的时间的序列。 换句话说，平稳性意味着某个时间序列的数据生成过程（data-generating process, DGP）的统计特性不随时间变化。
+
+更正式地说，平稳性有多种定义，其中一些定义比其他定义更严格。 对于实际用例，我们可以使用一种称为弱平稳性（或协方差平稳性）的方法。 对于要归类为（协方差）平稳的时间序列，它必须满足以下三个条件：
+\begin{itemize}
+    \item 系列的平均值必须恒定
+    \item 系列的方差必须是有限且恒定的
+    \item 相同距离的周期之间的协方差必须恒定
+\end{itemize}
+
+ADF 和 KPSS 检验的一个潜在缺点是它们不允许结构中断的可能性，即数据生成过程的平均值或其他参数的突然变化。 Zivot-Andrews 测试允许该系列中出现单一结构断裂的可能性，但其发生时间未知。
+\section{使用指数平滑方法对时间序列建模}
+
+\textbf{指数平滑方法}是经典预测模型的两大家族之一。 他们的基本思想是，预测只是过去观察结果的加权平均值。 在计算这些平均值时，更多地关注最近的观察结果。 为了实现这一目标，权重随着时间呈指数衰减。 这些模型适用于非平稳数据，即具有趋势和/或季节性的数据。 平滑方法很受欢迎，因为它们速度快（不需要大量计算）并且在预测准确性方面相对可靠。
+
+总的来说，指数平滑方法可以根据 ETS 框架（误差 error、趋势 trend 和季节 season）进行定义，因为它们结合了平滑计算中的基础组件。 与季节分解的情况一样，这些项可以加法、乘法组合，或者简单地从模型中排除。
+
+最简单的模型称为简单指数平滑 (SES, simple exponential smoothing)。 此类模型最适合所考虑的时间序列不表现出任何趋势或季节性的情况。 它们也适用于只有几个数据点的系列。 该模型由值在 0 到 1 之间的平滑参数 $\alpha$ 进行参数化。越高值越大，最近的观察结果就越受重视。 当 $\alpha = 0$ 时，对未来的预测等于训练数据的平均值。 当 $\alpha = 1$时，所有预测值与训练集中上一次预测值相同。
+
+使用 SES 生成的预测是平坦的，也就是说，无论时间范围如何，所有预测都具有相同的值（对应于最后一个级别的组件）。 这就是为什么这种方法只适用于既没有趋势也没有季节性的序列。
+
+霍尔特线性趋势法（Holt's linear trend method）（也称为霍尔特双指数平滑法（Holt's double exponential smoothing method））是 SES 的扩展，通过将趋势分量添加到模型规范中来解释序列中的趋势。 因此，当数据存在趋势时应该使用该模型，但它仍然无法处理季节性。
+
+霍尔特模型的一个问题是趋势在未来是恒定的，这意味着它会无限期地增加/减少。 这就是为什么模型的扩展通过添加阻尼参数 $\phi$ 来抑制趋势。 它使趋势在未来收敛到一个恒定值，有效地将其压平。
+
+\begin{tcolorbox}
+    $\phi$ is rarely smaller than 0.8, as the dampening has a very strong effect for smaller values of $\phi$ . The best practice is to restrict the values of $\phi$ so that they lie between 0.8 and 0.98. For $\phi = 1$ the damped model is equivalent to the model without dampening.
+\end{tcolorbox}
+
+最后，我们将介绍霍尔特方法的扩展，称为霍尔特-温特斯季节性平滑（Holt-Winters' seasonal smoothing）（也称为霍尔特-温特斯三重指数平滑，Holt-Winters' triple exponential smoothing）。 顾名思义，它解释了时间序列中的季节性。 无需赘述，该方法最适合具有以下特征的数据：趋势和季节性。
+
+该模型有两种变体，它们具有加性或乘性季节性。 在前一种情况下，季节性变化在整个时间序列中或多或少是恒定的。 在后一种情况下，变化随着时间的推移而发生变化。

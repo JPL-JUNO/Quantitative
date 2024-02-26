@@ -1,0 +1,10 @@
+binance-connector
+yfinance
+plotly
+bokeh==2.3.4
+cufflinks
+pandas_bokeh
+mplfinance
+sktime
+cpi==1.0.18
+pmdarima
