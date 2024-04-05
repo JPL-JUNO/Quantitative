@@ -22,3 +22,4 @@ token
 *.ini
 rename.py
 draft.*
+.vscode
