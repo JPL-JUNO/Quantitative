@@ -81,7 +81,7 @@ mnist_path = Path("mnist")
 if not mnist_path.exists():
     mnist_path.mkdir()
 np.save(mnist_path / "data", mnist.data.astype(np.uint8))
-np.save(mnist / "label", mnist.target.astype(np.uint8))
+np.save(mnist_path / "label", mnist.target.astype(np.uint8))
 
 # Fashion MNIST Image Data
 fashion_mnist = fetch_openml(name="Fashion-MNIST")
