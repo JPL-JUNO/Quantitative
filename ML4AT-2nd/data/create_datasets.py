@@ -56,10 +56,10 @@ with pd.HDFStore(DATA_STORE) as store:
 
 url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
 df = pd.read_html(url, header=0)[0]
+# sec_filings 被舍弃了
 df.columns = [
     "ticker",
     "name",
-    "sec_filings",
     "gics_sector",
     "gics_sub_industry",
     "location",
@@ -67,7 +67,7 @@ df.columns = [
     "cik",
     "founded",
 ]
-df = df.drop("sec_filings", axis=1).set_index("ticker")
+df = df.set_index("ticker")
 with pd.HDFStore(DATA_STORE) as store:
     store.put("sp500/stocks", df)
 
