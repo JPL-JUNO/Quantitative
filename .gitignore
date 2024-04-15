@@ -19,6 +19,10 @@ MPY4FI/code/token.txt
 *.out
 token
 *.toc
-MFPR/account.ini
+*.ini
 rename.py
 draft.*
+.vscode
+ML4AT-2nd/data/wiki_prices.csv
+ML4AT-2nd/data/assets.h5
+venv
