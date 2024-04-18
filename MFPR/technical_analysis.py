@@ -13,7 +13,7 @@ import sys
 from os import path
 
 sys.path.append(path.normpath(path.join(path.dirname(__file__), "..")))
-from utils.indicators import add_column, delete_row, delete_column
+from utils.data_manipulate import add_column, delete_row, delete_column
 
 
 def ma(data: np.array, lookback: int, close: int, position: int):

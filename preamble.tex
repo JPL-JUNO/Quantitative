@@ -1,6 +1,89 @@
-\usepackage{ctex}
-\usepackage{mathptmx}
 \usepackage{amsmath, amssymb}
-\usepackage{geometry}
+\usepackage{ulem}
+\usepackage{mathptmx}
+\usepackage{ctex}
 \usepackage{tcolorbox}
+\usepackage{epigraph}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{pdfpages}
+\usepackage{graphicx}
+\setkeys{Gin}{width=0.4\textwidth}
+\usepackage{listings}
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\usepackage{tikz}
+\usepackage{pifont}
+\usepackage{tabularx}
+% \usepackage{algorithm}
+\usepackage[lined,boxed,ruled]{algorithm2e}
+\usepackage{bm}
+
+
+% 在part页添加内容
+\makeatletter
+\let\old@endpart\@endpart
+\renewcommand\@endpart[1][]{%
+    \begin{quote}#1\end{quote}%
+    \old@endpart}
+\makeatother
+
+
+\newcommand\tips[1]{\textcolor{green!50!black}{#1}}
+\newcommand\notes[1]{\textcolor{blue!50!black}{#1}}
+\newcommand\important[1]{\textcolor{red!90!black}{#1}}
+
+\newcommand\figures[2]{
+    \begin{figure}
+        \centering
+        \includegraphics{../img/#1.png}
+        \caption{#2}
+        \label{#1}
+    \end{figure}
+}
+
+\usepackage{enumitem}
+% 去掉enumerate、itemize、description中的间隙
+\setlist{noitemsep, topsep=0pt}
+
+\tcbuselibrary{breakable}
+\tcbset{breakable}
+% \newtcblisting[auto counter, number within =chapter]{py}[1]{listing engine=minted,
+% 	minted style=colorful,
+% 	minted language=python,
+% 	minted options={breaklines,autogobble,linenos,numbersep=3mm},
+% 	colback=red!5!white,colframe=orange!50!blue,listing only, left=5mm,enhanced,
+% 	title=Examples~\thetcbcounter~#1,
+% 	breakable,
+% 	enhanced
+% 	%						 overlay={
+% 	%						 	\begin{tcbclipinterior}
+% 	%						 		\fill[red!30!white] (frame.south west)
+% 	%						 		rectangle ([xshift=5mm]frame.north west);
+% 	%							\end{tcbclipinterior}}
+% }
+\usepackage{geometry}
+
 \usepackage{hyperref}
+% 将引用的chapter改写为Chapter
+\usepackage[english]{babel}
+\addto\extrasenglish{
+    \def\chapterautorefname{Chapter}
+}
+\addto\extrasenglish{
+    \def\sectionautorefname{Section}
+}
+\usepackage{orcidlink}
+\definecolor{SWJTU}{HTML}{025483}
+% 全局取消段前缩进
+% \setlength{\parindent}{0pt}
+% \setlength{\parskip}{5pt}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=SWJTU,
+    filecolor=SWJTU,
+    urlcolor=SWJTU,
+    citecolor=SWJTU,
+}
+
+
