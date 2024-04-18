@@ -1,5 +1,5 @@
 """
-@File         : data_manipulate.py
+@File         : indicators.py
 @Author(s)    : Stephen CUI
 @LastEditor(s): Stephen CUI
 @CreatedTime  : 2024-04-17 20:50:57

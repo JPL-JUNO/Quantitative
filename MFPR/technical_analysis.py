@@ -13,7 +13,7 @@ import sys
 from os import path
 
 sys.path.append(path.normpath(path.join(path.dirname(__file__), "..")))
-from utils.data_manipulate import add_column, delete_row
+from utils.indicators import add_column, delete_row, delete_column
 
 
 def ma(data: np.array, lookback: int, close: int, position: int):
@@ -52,6 +52,21 @@ def smoothed_ma(data: np.ndarray, alpha: float, lookback, close, position):
 
 def rsi(data, lookback, close, position):
     data = add_column(data, 5)
+    for i in range(len(data)):
+        data[i, position] = data[i, close] - data[i - 1, close]
+    for i in range(len(data)):
+        if data[i, position] > 0:
+            data[i, position + 1] = data[i, position]
+        elif data[i, position] < 0:
+            data[i, position + 2] = abs(data[i, position])
+    data = smoothed_ma(data, 2, lookback, position + 1, position + 3)
+    data = smoothed_ma(data, 2, lookback, position + 2, position + 4)
+    data[:, position + 5] = data[:, position + 3] / data[:, position + 4]
+
+    data = delete_column(data, position, 6)
+    data = delete_row(data, lookback)
+
+    return data
 
 
 if __name__ == "__main__":
