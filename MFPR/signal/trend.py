@@ -128,46 +128,102 @@ def three_candles_pd(data: pd.DataFrame, body=0.01) -> np.ndarray:
     return signal
 
 
-df = pd.read_csv("./data/510880 ETF Stock Price History.csv", parse_dates=["Date"])
-df = df.rename({"Price": "Close"}, axis=1)
-df = df.sort_values(by="Date", ascending=True, ignore_index=True)
-# Signal 中的 1 表示当天出现了 marubozu，应该能搞操作的空间是在下一个交易日
-# df["Signal"] = df.apply(marubozu_pd, axis=1)
-# df["Signal"] = df["Signal"].shift(1)
+def tasuki(data, open_column, close_column: int, buy_column: int, sell_column: int):
+    data = add_column(data, 5)
+    for i in range(len(data)):
+        try:
+            # Bullish pattern
+            if (
+                data[i, close_column] < data[i, open_column]
+                and data[i, close_column] < data[i - 1, open_column]
+                and data[i, close_column] > data[i - 2, close_column]
+                and data[i - 1, close_column] > data[i - 1, open_column]
+                and data[i - 1, open_column] > data[i - 2, close_column]
+                and data[i - 2, close_column] > data[i - 2, open_column]
+            ):
+                data[i + 1, buy_column] = 1
+            # Bearish pattern
+            elif (
+                data[i, close_column] > data[i, open_column]
+                and data[i, close_column] > data[i - 1, open_column]
+                and data[i, close_column] < data[i - 2, close_column]
+                and data[i - 1, close_column] < data[i - 1, open_column]
+                and data[i - 1, open_column] < data[i - 2, close_column]
+                and data[i - 2, close_column] < data[i - 2, open_column]
+            ):
+                data[i + 1, sell_column] = -1
+        except IndexError:
+            pass
 
-import matplotlib.pyplot as plt
 
-# bullish__long = df["Signal"] == 1
-# bullish__short = df["Signal"] == -1
-# fig, ax = plt.subplots(figsize=(15, 5))
-# ax.plot(df["Close"], linewidth=0.5)
-# ax.plot(df[bullish__long]["Close"], marker="^", linestyle="None", color="red")
-# ax.plot(df[bullish__short]["Close"], marker="v", linestyle="None", color="purple")
+def tasuki_pd(data: pd.DataFrame):
+    rolled = data.rolling(window=3)
+    signal = np.zeros(len(data))
+    up_down = pd.Series([True, True, False])
+    for idx, df in enumerate(rolled):
+        if idx < 2:
+            continue
+        # 前两个应该是阳线，第三个是阴线
+        up_down.index = df.index
+        mask1_up = (df["Close"] > df["Open"]).equals(up_down)  # 基于索引的比较
+        gap = df["Open"].iloc[1] > df["Close"].iloc[0]  # 跳开（多）
+        mask2_up = df["Close"].iloc[0] < df["Close"].iloc[2] < df["Open"].iloc[1]
+        if mask1_up and gap and mask2_up:
+            signal[idx] = 1
+            continue
+        # 阴线、阴线、阳线
+        mask1_down = (df["Close"] < df["Open"]).equals(up_down)
+        gap_down = df["Open"].iloc[1] < df["Close"].iloc[0]  # 跳开（空）
+        mask2_down = df["Open"].iloc[1] < df["Close"].iloc[2] < df["Close"].iloc[0]
+        if mask1_down and gap_down and mask2_down:
+            signal[idx] = -1
 
-signal = three_candles_pd(df)
-df["signal"] = signal
+    return signal
 
-fig, ax = plt.subplots(figsize=(18, 6))
-ax.plot(df["Close"], linewidth=1, label="Close")
-long = df["signal"] == 1
-short = df["signal"] == -1
-ax.plot(
-    df[long]["Close"],
-    marker="^",
-    linestyle="None",
-    color="red",
-    markersize=2,
-    label="Long",
-)
-ax.plot(
-    df[short]["Close"],
-    marker="v",
-    linestyle="None",
-    color="purple",
-    markersize=2,
-    label="Short",
-)
-plt.legend()
-plt.title("510880 Three Candles")
-plt.tight_layout()
-plt.savefig("./figures/510880_three_candles.png", dpi=500)
+
+if __name__ == "__main__":
+    underlying = "CSI300"
+    df = pd.read_csv(f"./data/A/{underlying}.csv", parse_dates=["Date"], thousands=",")
+    df = df.rename({"Price": "Close"}, axis=1)
+    df = df.sort_values(by="Date", ascending=True, ignore_index=True)
+    # Signal 中的 1 表示当天出现了 marubozu，应该能搞操作的空间是在下一个交易日
+    # df["Signal"] = df.apply(marubozu_pd, axis=1)
+    # df["Signal"] = df["Signal"].shift(1)
+    signal = tasuki_pd(df)
+    df["signal"] = signal
+    import matplotlib.pyplot as plt
+
+    # bullish__long = df["Signal"] == 1
+    # bullish__short = df["Signal"] == -1
+    # fig, ax = plt.subplots(figsize=(15, 5))
+    # ax.plot(df["Close"], linewidth=0.5)
+    # ax.plot(df[bullish__long]["Close"], marker="^", linestyle="None", color="red")
+    # ax.plot(df[bullish__short]["Close"], marker="v", linestyle="None", color="purple")
+
+    # signal = three_candles_pd(df)
+    # df["signal"] = signal
+
+    fig, ax = plt.subplots(figsize=(18, 6))
+    ax.plot(df["Close"], linewidth=1, label="Close")
+    long = df["signal"] == 1
+    short = df["signal"] == -1
+    ax.plot(
+        df[long]["Close"],
+        marker="^",
+        linestyle="None",
+        color="red",
+        markersize=2,
+        label="Long",
+    )
+    ax.plot(
+        df[short]["Close"],
+        marker="v",
+        linestyle="None",
+        color="purple",
+        markersize=2,
+        label="Short",
+    )
+    plt.legend()
+    plt.title(f"{underlying} Three Candles")
+    plt.tight_layout()
+    plt.savefig(f"./figures/{underlying}_tasuki.png", dpi=500)
