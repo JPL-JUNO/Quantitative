@@ -212,7 +212,7 @@ if __name__ == "__main__":
         marker="^",
         linestyle="None",
         color="red",
-        markersize=2,
+        markersize=4,
         label="Long",
     )
     ax.plot(
@@ -220,7 +220,7 @@ if __name__ == "__main__":
         marker="v",
         linestyle="None",
         color="purple",
-        markersize=2,
+        markersize=4,
         label="Short",
     )
     plt.legend()
