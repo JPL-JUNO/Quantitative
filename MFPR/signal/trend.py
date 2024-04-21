@@ -216,7 +216,7 @@ def three_methods(
                 data[i + 1, sell_column] = -1
         except IndexError:
             pass
-    pass
+    return data
 
 
 def three_methods_pd(data: pd.DataFrame) -> np.ndarray:
@@ -246,17 +246,91 @@ def three_methods_pd(data: pd.DataFrame) -> np.ndarray:
     return signal
 
 
+def hikkake(
+    data, open_column, high_column, low_column, close_column, buy_signal, sell_signal
+):
+    data = add_column(data, 5)
+    for i in range(len(data)):
+        try:
+            # Bullish pattern
+            if (
+                data[i, close_column] > data[i - 3, high_column]
+                and data[i, close_column] > data[i - 4, close_column]
+                and data[i - 1, low_column] < data[i, open_column]
+                and data[i - 1, close_column] < data[i, close_column]
+                and data[i - 1, high_column] <= data[i - 3, high_column]
+                and data[i - 2, high_column] <= data[i - 3, high_column]
+                and data[i - 2, low_column] < data[i, open_column]
+                and data[i - 2, close_column] < data[i, close_column]
+                and data[i - 3, high_column] < data[i - 4, high_column]
+                and data[i - 3, low_column] > data[i - 4, low_column]
+                and data[i - 4, close_column] > data[i - 4, open_column]
+            ):
+                data[i + 1, buy_signal] = 1
+            elif (
+                data[i, close_column] < data[i - 3, low_column]
+                and data[i, close_column] < data[i - 4, close_column]
+                and data[i - 1, high_column] > data[i, open_column]
+                and data[i - 1, close_column] > data[i, close_column]
+                and data[i - 1, low_column] >= data[i - 3, low_column]
+                and data[i - 2, low_column] >= data[i - 3, low_column]
+                and data[i - 2, high_column] > data[i, open_column]
+                and data[i - 2, close_column] > data[i, close_column]
+                and data[i - 3, low_column] > data[i - 4, low_column]
+                and data[i - 3, high_column] < data[i - 4, high_column]
+                and data[i - 4, close_column] < data[i - 4, open_column]
+            ):
+                data[i + 1, sell_signal] = -1
+        except IndexError:
+            pass
+    return data
+
+
+def hikkake_pd(data):
+    rolled = data.rolling(window=5)
+    signal = np.zeros(len(data))
+    for idx, df in enumerate(rolled):
+        if idx < 4:
+            continue
+        c1 = df["Close"].iloc[-1] > df["High"].iloc[-4]
+        c2 = df["Close"].iloc[-1] > df["Close"].iloc[0]
+        c3 = df["Low"].iloc[-2] < df["Open"].iloc[-1]
+        c4 = df["Close"].iloc[-2] < df["Close"].iloc[-1]
+        c5 = all(df["High"].iloc[2:4] <= df["High"].iloc[1])
+        c6 = df["Low"].iloc[-3] < df["Open"].iloc[-1]
+        c7 = df["Close"].iloc[-3] < df["Close"].iloc[-1]
+        c8 = df["High"].iloc[1] < df["High"].iloc[0]
+        c9 = df["Low"].iloc[1] > df["Low"].iloc[0]
+        c10 = df["Close"].iloc[0] > df["Open"].iloc[0]
+        if all([c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]):
+            signal[idx] = 1
+            continue
+        c1 = df["Close"].iloc[-1] < df["High"].iloc[-4]
+        c2 = df["Close"].iloc[-1] < df["Close"].iloc[0]
+        c3 = df["High"].iloc[-2] > df["Open"].iloc[-1]
+        c4 = df["Close"].iloc[-2] > df["Close"].iloc[-1]
+        c5 = all(df["Low"].iloc[2:4] >= df["Low"].iloc[1])
+        c6 = df["High"].iloc[-3] > df["Open"].iloc[-1]
+        c7 = df["Close"].iloc[-3] > df["Close"].iloc[-1]
+        c8 = df["Low"].iloc[1] > df["Low"].iloc[0]  #
+        c9 = df["High"].iloc[1] < df["High"].iloc[0]  #
+        c10 = df["Close"].iloc[0] < df["Open"].iloc[0]
+        if all([c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]):
+            signal[idx] = -1
+    return signal
+
+
 if __name__ == "__main__":
-    underlying = "CSI300"
+    underlying = "510880"
     df = pd.read_csv(f"./data/A/{underlying}.csv", parse_dates=["Date"], thousands=",")
     df = df.rename({"Price": "Close"}, axis=1)
     df = df.sort_values(by="Date", ascending=True, ignore_index=True)
     # Signal 中的 1 表示当天出现了 marubozu，应该能搞操作的空间是在下一个交易日
     # df["Signal"] = df.apply(marubozu_pd, axis=1)
     # df["Signal"] = df["Signal"].shift(1)
-    # signal = tasuki_pd(df)
-    # df["signal"] = signal
-    # import matplotlib.pyplot as plt
+    signal = hikkake_pd(df)
+    df["signal"] = signal
+    import matplotlib.pyplot as plt
 
     # # bullish__long = df["Signal"] == 1
     # # bullish__short = df["Signal"] == -1
@@ -268,27 +342,27 @@ if __name__ == "__main__":
     # # signal = three_candles_pd(df)
     # # df["signal"] = signal
 
-    # fig, ax = plt.subplots(figsize=(18, 6))
-    # ax.plot(df["Close"], linewidth=1, label="Close")
-    # long = df["signal"] == 1
-    # short = df["signal"] == -1
-    # ax.plot(
-    #     df[long]["Close"],
-    #     marker="^",
-    #     linestyle="None",
-    #     color="red",
-    #     markersize=4,
-    #     label="Long",
-    # )
-    # ax.plot(
-    #     df[short]["Close"],
-    #     marker="v",
-    #     linestyle="None",
-    #     color="purple",
-    #     markersize=4,
-    #     label="Short",
-    # )
-    # plt.legend()
-    # plt.title(f"{underlying} Three Candles")
-    # plt.tight_layout()
-    # plt.savefig(f"./figures/{underlying}_tasuki.png", dpi=500)
+    fig, ax = plt.subplots(figsize=(18, 6))
+    ax.plot(df["Close"], linewidth=1, label="Close")
+    long = df["signal"] == 1
+    short = df["signal"] == -1
+    ax.plot(
+        df[long]["Close"],
+        marker="^",
+        linestyle="None",
+        color="red",
+        markersize=4,
+        label="Long",
+    )
+    ax.plot(
+        df[short]["Close"],
+        marker="v",
+        linestyle="None",
+        color="purple",
+        markersize=4,
+        label="Short",
+    )
+    plt.legend()
+    plt.title(f"{underlying} Three Candles")
+    plt.tight_layout()
+    plt.savefig(f"./figures/{underlying}_tasuki.png", dpi=500)

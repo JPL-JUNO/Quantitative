@@ -25,8 +25,23 @@ class ClassicTrend(FinancialPatternRecognition):
     def marubozu(self, data: pd.DataFrame):
         self.pattern = inspect.currentframe().f_code.co_name
         signal = np.zeros(len(data))  # 初始化信号
+        for idx, ser in df.iterrows():
+            if (
+                ser["Close"] > ser["Open"]
+                and ser["High"] == ser["Close"]
+                and ser["Open"] == ser["Low"]
+            ):
+                signal[idx] = 1
+                continue
+            elif (
+                ser["Close"] < ser["Open"]
+                and ser["High"] == ser["Open"]
+                and ser["Close"] == ser["Low"]
+            ):
+                signal[idx] = -1
+        return signal
 
-    def three_candles_pd(self, data: pd.DataFrame, body=0.01) -> np.ndarray:
+    def three_candles(self, data: pd.DataFrame, body=0.01) -> np.ndarray:
         self.pattern = inspect.currentframe().f_code.co_name
         rolled = data.rolling(window=4)
         signal = np.zeros(len(data))
@@ -67,6 +82,40 @@ class ClassicTrend(FinancialPatternRecognition):
             if mask1_down and gap_down and mask2_down:
                 signal[idx] = -1
 
+        return signal
+
+    def hikkake(self, data: pd.DataFrame) -> np.ndarray:
+        self.pattern = inspect.currentframe().f_code.co_name
+        rolled = data.rolling(window=5)
+        signal = np.zeros(len(data))
+        for idx, df in enumerate(rolled):
+            if idx < 4:
+                continue
+            c1 = df["Close"].iloc[-1] > df["High"].iloc[-4]
+            c2 = df["Close"].iloc[-1] > df["Close"].iloc[0]
+            c3 = df["Low"].iloc[-2] < df["Open"].iloc[-1]
+            c4 = df["Close"].iloc[-2] < df["Close"].iloc[-1]
+            c5 = all(df["High"].iloc[2:4] <= df["High"].iloc[1])
+            c6 = df["Low"].iloc[-3] < df["Open"].iloc[-1]
+            c7 = df["Close"].iloc[-3] < df["Close"].iloc[-1]
+            c8 = df["High"].iloc[1] < df["High"].iloc[0]
+            c9 = df["Low"].iloc[1] > df["Low"].iloc[0]
+            c10 = df["Close"].iloc[0] > df["Open"].iloc[0]
+            if all([c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]):
+                signal[idx] = 1
+                continue
+            c1 = df["Close"].iloc[-1] < df["High"].iloc[-4]
+            c2 = df["Close"].iloc[-1] < df["Close"].iloc[0]
+            c3 = df["High"].iloc[-2] > df["Open"].iloc[-1]
+            c4 = df["Close"].iloc[-2] > df["Close"].iloc[-1]
+            c5 = all(df["Low"].iloc[2:4] >= df["Low"].iloc[1])
+            c6 = df["High"].iloc[-3] > df["Open"].iloc[-1]
+            c7 = df["Close"].iloc[-3] > df["Close"].iloc[-1]
+            c8 = df["Low"].iloc[1] > df["Low"].iloc[0]  #
+            c9 = df["High"].iloc[1] < df["High"].iloc[0]  #
+            c10 = df["Close"].iloc[0] < df["Open"].iloc[0]
+            if all([c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]):
+                signal[idx] = -1
         return signal
 
 
