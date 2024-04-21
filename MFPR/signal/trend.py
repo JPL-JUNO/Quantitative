@@ -181,6 +181,71 @@ def tasuki_pd(data: pd.DataFrame):
     return signal
 
 
+def three_methods(
+    data, open_column, high_column, low_column, close_column, buy_column, sell_column
+):
+    data = add_column(data, 5)
+    for i in range(len(data)):
+        try:
+            # Bullish pattern
+            if (
+                data[i, close_column] > data[i, open_column]
+                and data[i, close_column] > data[i - 4, high_column]
+                and data[i, low_column] < data[i - 1, low_column]
+                and data[i - 1, close_column] < data[i - 4, close_column]
+                and data[i - 1, low_column] > data[i - 4, low_column]
+                and data[i - 2, close_column] < data[i - 4, close_column]
+                and data[i - 2, low_column] > data[i - 4, low_column]
+                and data[i - 3, close_column] < data[i - 4, close_column]
+                and data[i - 3, low_column] > data[i - 4, low_column]
+                and data[i - 4, close_column] > data[i - 4, open_column]
+            ):
+                data[i + 1, buy_column] = 1
+            # Bearish pattern
+            elif (
+                data[i, close_column] < data[i, open_column]
+                and data[i, close_column] < data[i - 4, high_column]
+                and data[i, high_column] > data[i - 1, high_column]
+                and data[i - 1, close_column] > data[i - 4, close_column]
+                and data[i - 1, high_column] < data[i - 4, high_column]
+                and data[i - 2, close_column] > data[i - 4, close_column]
+                and data[i - 2, high_column] < data[i - 4, high_column]
+                and data[i - 3, close_column] > data[i - 4, close_column]
+                and data[i - 3, high_column] < data[i - 4, high_column]
+            ):
+                data[i + 1, sell_column] = -1
+        except IndexError:
+            pass
+    pass
+
+
+def three_methods_pd(data: pd.DataFrame) -> np.ndarray:
+    # 此方法不确定具体的实现方式
+    # CONFIRM
+    rolled = data.rolling(window=5)
+    signal = np.zeros(len(data))
+    up_down = pd.Series([True, False, False, False, True])
+    for idx, df in enumerate(rolled):
+        if idx < 4:
+            continue
+        up_down.index = df.index
+        # 满足阳、阴阴阴、阳的线
+        mask1 = (df["Close"] > df["Open"]).equals(up_down)
+        above_low = all(df["Low"].iloc[1:4] > df["Low"].iloc[0])
+        below_high = all(df["High"].iloc[1:4] < df["High"].iloc[0])
+        mask2 = df["Close"].iloc[-1] > df["High"].iloc[0]
+        mask3 = df["Low"].iloc[-1] < df["Low"].iloc[-2]
+        if mask1 and below_high and above_low and mask2 and mask3:
+            signal[idx] = 1
+            continue
+        mask1 = (df["Close"] < df["Open"]).equals(up_down)
+        mask2 = df["Close"].iloc[-1] < df["Low"].iloc[0]
+        mask3 = df["High"].iloc[-1] > df["High"].iloc[-2]
+        if mask1 and above_low and below_high and mask2 and mask3:
+            signal[idx] = -1
+    return signal
+
+
 if __name__ == "__main__":
     underlying = "CSI300"
     df = pd.read_csv(f"./data/A/{underlying}.csv", parse_dates=["Date"], thousands=",")
@@ -189,41 +254,41 @@ if __name__ == "__main__":
     # Signal 中的 1 表示当天出现了 marubozu，应该能搞操作的空间是在下一个交易日
     # df["Signal"] = df.apply(marubozu_pd, axis=1)
     # df["Signal"] = df["Signal"].shift(1)
-    signal = tasuki_pd(df)
-    df["signal"] = signal
-    import matplotlib.pyplot as plt
-
-    # bullish__long = df["Signal"] == 1
-    # bullish__short = df["Signal"] == -1
-    # fig, ax = plt.subplots(figsize=(15, 5))
-    # ax.plot(df["Close"], linewidth=0.5)
-    # ax.plot(df[bullish__long]["Close"], marker="^", linestyle="None", color="red")
-    # ax.plot(df[bullish__short]["Close"], marker="v", linestyle="None", color="purple")
-
-    # signal = three_candles_pd(df)
+    # signal = tasuki_pd(df)
     # df["signal"] = signal
+    # import matplotlib.pyplot as plt
 
-    fig, ax = plt.subplots(figsize=(18, 6))
-    ax.plot(df["Close"], linewidth=1, label="Close")
-    long = df["signal"] == 1
-    short = df["signal"] == -1
-    ax.plot(
-        df[long]["Close"],
-        marker="^",
-        linestyle="None",
-        color="red",
-        markersize=4,
-        label="Long",
-    )
-    ax.plot(
-        df[short]["Close"],
-        marker="v",
-        linestyle="None",
-        color="purple",
-        markersize=4,
-        label="Short",
-    )
-    plt.legend()
-    plt.title(f"{underlying} Three Candles")
-    plt.tight_layout()
-    plt.savefig(f"./figures/{underlying}_tasuki.png", dpi=500)
+    # # bullish__long = df["Signal"] == 1
+    # # bullish__short = df["Signal"] == -1
+    # # fig, ax = plt.subplots(figsize=(15, 5))
+    # # ax.plot(df["Close"], linewidth=0.5)
+    # # ax.plot(df[bullish__long]["Close"], marker="^", linestyle="None", color="red")
+    # # ax.plot(df[bullish__short]["Close"], marker="v", linestyle="None", color="purple")
+
+    # # signal = three_candles_pd(df)
+    # # df["signal"] = signal
+
+    # fig, ax = plt.subplots(figsize=(18, 6))
+    # ax.plot(df["Close"], linewidth=1, label="Close")
+    # long = df["signal"] == 1
+    # short = df["signal"] == -1
+    # ax.plot(
+    #     df[long]["Close"],
+    #     marker="^",
+    #     linestyle="None",
+    #     color="red",
+    #     markersize=4,
+    #     label="Long",
+    # )
+    # ax.plot(
+    #     df[short]["Close"],
+    #     marker="v",
+    #     linestyle="None",
+    #     color="purple",
+    #     markersize=4,
+    #     label="Short",
+    # )
+    # plt.legend()
+    # plt.title(f"{underlying} Three Candles")
+    # plt.tight_layout()
+    # plt.savefig(f"./figures/{underlying}_tasuki.png", dpi=500)
