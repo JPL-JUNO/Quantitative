@@ -27,3 +27,5 @@ ML4AT-2nd/data/wiki_prices.csv
 ML4AT-2nd/data/assets.h5
 venv
 *.ini
+backtest/data/source_data/*.xlsx
+backtest/data/*.csv

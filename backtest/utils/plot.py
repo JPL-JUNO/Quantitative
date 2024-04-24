@@ -40,4 +40,6 @@ def show_signal(data: pd.DataFrame, markersize=4, dpi: int = 500, **kwargs):
     pattern = kwargs.get("pattern", "strategy")
     plt.title(f"{underlying} {pattern}")
     plt.tight_layout()
-    plt.savefig(f"./figures/{underlying}_{pattern}.png", dpi=dpi)
+    save = kwargs.get("save", None)
+    if save:
+        plt.savefig(f"./figures/{underlying}_{pattern}.png", dpi=dpi)
