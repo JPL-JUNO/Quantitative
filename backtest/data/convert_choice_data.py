@@ -16,7 +16,7 @@ def get_paths(dir, pattern):
         yield file, file.name
 
 
-paths = get_paths("./data/source_data", "*.xls")
+paths = get_paths("./data/source_data", "*.xlsx")
 for path, file_name in paths:
     df = pd.read_excel(path, parse_dates=["交易时间"])
     underlying = file_name.split("_")[1]
