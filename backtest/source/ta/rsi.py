@@ -34,7 +34,12 @@ class TARSI(Contrarian):
         self.df["signal"] = (self.df["rsi"] < self.buy_threshold).astype(int)
 
     def filter_signal(self):
-        self.df["signal_count"] = self.df["signal"].rolling(window=self.hold_days).sum()
+        self.df["signal_count"] = (
+            self.df["signal"]
+            .rolling(window=self.hold_days, min_periods=self.timeperiod + 1)
+            .sum()
+        )  # 避免因为第 timeperiod 至 hold_days 出现多次信号，而被 rolling 为 NaN，填充 signal_count 为 0
+        # 不进行下面的填充应该也是可以的
         self.df["signal_count"] = self.df["signal_count"].fillna(0)
         # 如果持有期内多次出现信号，不进行任何的操作，信号保持为 0
         self.df.loc[self.df["signal_count"] > 1, "signal"] = 0
