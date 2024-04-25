@@ -58,12 +58,12 @@ plt.xlim(0, len(df) - 1)
 plt.tight_layout()
 plt.savefig(f"./figures/RSI_{underlying}.png", dpi=500)
 # assert df['signal'].sum() == 21
-long_df = df.loc[df["signal"] ==1]
+long_df = df.loc[df["signal"] == 1]
 
 fig, ax = plt.subplots(2, 1, sharex=True)
-colors = ['red' if val > 0 else 'green' for val in long_df['hold_returns']]
+colors = ["red" if val > 0 else "green" for val in long_df["hold_returns"]]
 long_df["hold_returns"].plot(kind="bar", ax=ax[0], color=colors)
-long_df["rsi"].plot(kind="bar", ax=ax[1], hatch='\\\\')
+long_df["rsi"].plot(kind="bar", ax=ax[1], hatch="\\\\")
 ax[1].axhline(buy_threshold, color="red", linestyle=":")
 plt.tight_layout()
 plt.savefig(f"./figures/RSI_{underlying}_hit_ratio.png", dpi=500)

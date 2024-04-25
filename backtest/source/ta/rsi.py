@@ -17,6 +17,7 @@ from source.contrarian import Contrarian
 
 class TARSI(Contrarian):
     def __init__(self, underlying) -> None:
+        super().__init__()
         self.underlying = underlying
 
     def set_parameters(self, buy_threshold, hold_days, timeperiod=5):
@@ -36,7 +37,10 @@ class TARSI(Contrarian):
     def filter_signal(self):
         self.df["signal_count"] = (
             self.df["signal"]
-            .rolling(window=self.hold_days, min_periods=self.timeperiod + 1)
+            .rolling(
+                window=self.hold_days,
+                min_periods=min(self.hold_days, self.timeperiod + 1),
+            )
             .sum()
         )  # 避免因为第 timeperiod 至 hold_days 出现多次信号，而被 rolling 为 NaN，填充 signal_count 为 0
         # 不进行下面的填充应该也是可以的
@@ -57,8 +61,6 @@ class TARSI(Contrarian):
             self.df.rolling(window=self.hold_days + 1)["signal"].sum().max() <= 1
         ), ValueError("存在持仓期内多次开仓信号")
 
-        self.long_df = self.df.loc[self.df["signal"] == 1]
-
     def calculate_returns(self):
         self.df["hold_returns"] = (
             self.df["returns"]
@@ -72,6 +74,8 @@ class TARSI(Contrarian):
 
         # 基线策略，买入并持有
         self.df["base_returns"] = self.df["returns"].cumsum().apply(np.exp)
+
+        self.long_df = self.df.loc[self.df["signal"] == 1]
 
     def show_signal(self, save=False):
         _, ax = plt.subplots(3, 1, figsize=(18, 10), sharex=True)
@@ -94,7 +98,7 @@ class TARSI(Contrarian):
             plt.savefig(f"./figures/RSI_{self.underlying}.png", dpi=500)
 
     def show_profit_and_loss(self, save=False):
-        _, ax = plt.subplots(2, 1, sharex=True)
+        _, ax = plt.subplots(2, 1, figsize=(18, 10), sharex=True)
         colors = ["red" if val > 0 else "green" for val in self.long_df["hold_returns"]]
         self.long_df["hold_returns"].plot(kind="bar", ax=ax[0], color=colors)
         self.long_df["rsi"].plot(kind="bar", ax=ax[1], hatch="\\\\")
@@ -114,7 +118,7 @@ class TARSI(Contrarian):
             print("timeperiod 使用默认参数：5")
             self.timeperiod = 5
         self.load_data()
-        self.calculate_returns()
         self.filter_signal()
+        self.calculate_returns()
         self.show_signal(save=True)
         self.show_profit_and_loss(save=True)
