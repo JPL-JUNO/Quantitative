@@ -13,7 +13,7 @@ from os import path
 sys.path.append(path.join(path.dirname(__file__), ".."))
 from source.ta.rsi import TARSI
 
-underlying = "603619"
+underlying = "513500"
 
 rsi = TARSI(underlying=underlying)
 rsi.set_parameters(buy_threshold=20, hold_days=10, timeperiod=5)
