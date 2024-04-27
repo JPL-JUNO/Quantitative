@@ -33,7 +33,42 @@ df["hold_returns"] = df["returns"].cumsum().apply(np.exp)
 # ax[0].legend()
 
 # df[["strategy_returns", "hold_returns"]].plot(ax=ax[1])
+rsi_threshold = 30
+rsi_timeperiod = 14
+rsi = RSI(df["close"], timeperiod=rsi_timeperiod)
+df["signal_rsi"] = (rsi < rsi_threshold).astype(int)
 
-rsi = RSI(df["close"], timeperiod=14)
-df["signal_rsi"] = (rsi < 30).astype(int)
-df['cumsum_returns'] = df['returns'][::-1].shift(1).cumsum().apply(np.exp)
+df["cost"] = 100 * df["close"] * df["signal_rsi"]  # 买入一百股
+df["total_cost"] = df["cost"].cumsum()
+
+total_market = pd.Series(np.zeros(samples_num))
+for idx in df[df["signal_rsi"] == 1].index:
+    if idx + 1 <= samples_num:
+        current_market = (
+            (df["returns"].iloc[idx + 1 :]).cumsum().apply(np.exp)
+            * 100
+            * df["close"].iloc[idx]
+        )
+        total_market = total_market.add(current_market, fill_value=0)
+
+df["total_market"] = total_market
+
+fig, ax = plt.subplots(3, 1, figsize=(18, 8))
+df[["total_cost", "total_market"]].plot(ax=ax[0])
+df["close"].plot(ax=ax[1])
+long_df = df[df["signal_rsi"] == 1]
+ax[2].plot(long_df["signal_rsi"], linestyle="None", marker="+")
+plt.suptitle(f"Contribution Buy {underlying} via RSI {rsi_timeperiod}_{rsi_threshold}")
+plt.tight_layout()
+
+invest_cost = df["total_cost"].iloc[-1]
+invest_market = df["total_market"].iloc[-1]
+
+print(f"Current underlying: {underlying!r}")
+print(f"Total cost: {invest_cost:.2f}\nTotal market: {invest_market:.2f}")
+print(f"Total buy signal: {len(long_df)}")
+years = round((df["date"].iloc[-1] - df["date"].iloc[0]).days / 365)
+bh_annualize_returns = df["hold_returns"].iloc[-1] ** (1 / years) - 1
+contribute_annualize_returns = (invest_market / invest_cost) ** (1 / years) - 1
+print(f"Buy and hold annualized returns: {bh_annualize_returns:.2%}")
+print(f"Contribution annualized returns: {contribute_annualize_returns:.2%}")

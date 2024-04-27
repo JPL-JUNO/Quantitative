@@ -20,11 +20,11 @@ from source.contribute_base import Contribute
 
 
 class ContributeRSI(Contribute):
-    def __init__(self, underlying) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.underlying = underlying
 
-    def set_parameters(self, threshold=30, timeperiod=14):
+    def set_parameters(self, underlying, threshold=30, timeperiod=14):
+        self.underlying = underlying
         self.threshold = threshold
         self.timeperiod = timeperiod
 
@@ -32,8 +32,8 @@ class ContributeRSI(Contribute):
         rsi = RSI(self.df["close"], timeperiod=self.timeperiod)
         self.df["signal"] = (rsi < self.threshold).astype(int)
 
-    def backtest(self):
-        self.set_parameters()
+    def backtest(self, underlying, threshold=30, timeperiod=14):
+        self.set_parameters(underlying, threshold=threshold, timeperiod=timeperiod)
         self.load_data()
         self.signal()
         self.calculate_cost_and_returns()
