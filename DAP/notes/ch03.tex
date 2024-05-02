@@ -1,0 +1,11 @@
+\chapter{市场典型事实\label{ch03}}
+\section{基本案例：正态收益率}
+在案例中，我们将考虑 BSM 的几何布朗运动模型，该模型可以如下的 SDE 表示：
+\begin{equation}
+    dS_t = rS_tdt + \sigma S_tdZ_t
+\end{equation}
+一个更容易模型的离散版本，可以如下的差分方程表示：
+\begin{equation}
+    S_t = S_{t-\Delta_t}e^{(r-\frac{1}{2}\sigma^2)\Delta t+\sigma \sqrt{\Delta t}z_t}
+\end{equation}
+其中，$t\in {\Delta t, 2\Delta t, \dots, T}$，$z_t$ 是服从标准正态分布的随机变量。
