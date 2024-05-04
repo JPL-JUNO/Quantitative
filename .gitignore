@@ -31,3 +31,4 @@ backtest/data/source_data/*.xlsx
 backtest/data/*.csv
 *.sql
 backtest/figures
+*.h5
