@@ -32,3 +32,4 @@ backtest/data/*.csv
 *.sql
 backtest/figures
 *.h5
+*.h5ts
