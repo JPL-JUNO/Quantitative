@@ -168,3 +168,137 @@ hits = np.sign(
 
 data["strategy"] = data["prediction"] * data["return"]
 data[["return", "strategy"]].sum().apply(np.exp)
+
+hours = np.array(
+    [
+        0.5,
+        0.75,
+        1.0,
+        1.25,
+        1.5,
+        1.75,
+        1.75,
+        2.0,
+        2.25,
+        2.5,
+        2.75,
+        3.0,
+        3.25,
+        3.5,
+        4.0,
+        4.25,
+        4.5,
+        4.75,
+        5.0,
+        5.5,
+    ]
+)
+success = np.array([0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1])
+
+data = pd.DataFrame({"hours": hours, "success": success})
+
+from sklearn.neural_network import MLPClassifier
+
+model = MLPClassifier(hidden_layer_sizes=[32], max_iter=100, random_state=100)
+
+model.fit(data["hours"].values.reshape(-1, 1), data["success"])
+
+data["prediction"] = model.predict(data["hours"].values.reshape(-1, 1))
+
+symbol = "EUR="
+data = pd.DataFrame(raw[symbol])
+data.rename(columns={symbol: "price"}, inplace=True)
+data["return"] = data["price"].apply(np.log).diff()
+data["direction"] = np.where(data["return"] > 0, 1, 0)
+lags = 5
+cols = [f"lag_{lag}" for lag in range(1, lags + 1)]
+for lag, col in enumerate(cols, 1):
+    data[col] = data["return"].shift(lag)
+data.dropna(inplace=True)
+
+import tensorflow as tf
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.optimizers import Adam, RMSprop
+
+optimizer = Adam(learning_rate=1e-5)
+
+
+def set_seeds(seed=100):
+    random.seed(seed)
+    np.random.seed(seed)
+    tf.random.set_seed(seed)
+
+
+set_seeds()
+
+model = Sequential()
+model.add(Dense(64, activation="relu", input_shape=(lags,)))
+model.add(Dense(64, activation="relu"))
+model.add(Dense(1, active="sigmoid"))
+model.compile(optimizer=optimizer, loss="binary_crossentropy", metrics=["accuracy"])
+
+cutoff = "2017-12-31"
+training_data = data[data.index < cutoff].copy()
+mu, std = training_data.mean(), training_data.std()
+training_data_ = (training_data - mu) / std
+test_data = data[data.index >= cutoff].copy()
+test_data_ = (test_data - mu) / std
+
+model.fit(
+    training_data[cols],
+    training_data["direction"],
+    epochs=50,
+    verbose=False,
+    validation_split=0.2,
+    shuffle=False,
+)
+
+res = pd.DataFrame(model.history.history)
+res[["accuracy", "val_accuracy"]].plot(style="--")
+
+model.evaluate(training_data_[cols], training_data["direction"])
+
+pred = np.where(model.predict(training_data_[cols]) > 0.5, 1, 0)
+
+model.evaluate(test_data_[cols], test_data["direction"])
+
+pred = np.where(model.predict(test_data_[cols]) > 0.5, 1, 0)
+test_data["prediction"] = np.where(pred > 0, 1, -1)
+test_data["prediction"].value_counts()
+test_data["prediction"] = pred
+
+test_data["strategy"] = test_data["prediction"] * test_data["return"]
+
+# 添加不同类型的特征
+data["momentum"] = data["return"].rolling(5).mean().shift(1)
+data["volatility"] = data["return"].rolling(20).std().shift(1)
+data["distance"] = (data["price"] - data["price"].rolling(50).mean()).shift()
+data.dropna(inplace=True)
+cols.extend(["momentum", "volatility", "distance"])
+
+train = data[data.index < cutoff].copy()
+mu, std = train.mean(), train.std()
+train_ = (train - mu) / std
+test = data[data.index >= cutoff].copy()
+test_ = (test - mu) / std
+set_seeds()
+model = Sequential()
+model.add(Dense(32, activation="relu"))
+model.add(Dense(32, activation="relu"))
+model.add(Dense(1, activation="sigmoid"))
+model.compile(optimizer=optimizer, loss="binary_crossentropy", metrics=["accuracy"])
+
+model.fit(train_[cols], train["direction"], verbose=False, epochs=25)
+
+model.evaluate(train_[cols], train["direction"])
+pred = np.where(model.predict(train_[cols]) > 0.5, 1, -1)
+train_["prediction"] = pred
+train_["strategy"] = train["prediction"] * train["return"]
+
+
+model.evaluate(test_[cols], test["direction"])
+pred = np.where(model.predict(test_[cols]) > 0.5, 1, -1)
+test["prediction"] = pred
+
+test["strategy"] = test["prediction"] * test["return"]
