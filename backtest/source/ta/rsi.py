@@ -16,23 +16,24 @@ from source.contrarian import Contrarian
 
 
 class TARSI(Contrarian):
-    def __init__(self, underlying) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.underlying = underlying
 
-    def set_parameters(self, buy_threshold, hold_days, timeperiod=5):
+    def set_parameters(self, buy_threshold, hold_days=10, timeperiod=14):
         self.hold_days = hold_days
         self.buy_threshold = buy_threshold
         self.timeperiod = timeperiod
 
-    def load_data(self):
+    def load_data(self, underlying):
+        self.current_underlying = underlying
         self.df = pd.read_csv(
-            f"./data/{self.underlying}.csv", parse_dates=["date"], thousands=","
+            f"./data/{underlying}.csv", parse_dates=["date"], thousands=","
         )
         self.df["returns"] = self.df["close"].apply(np.log).diff()
         rsi = RSI(self.df["close"], self.timeperiod)
         self.df["rsi"] = rsi
-        self.df["signal"] = (self.df["rsi"] < self.buy_threshold).astype(int)
+        self.df["signal"] = np.where(self.df["rsi"] < self.buy_threshold, 1, 0)
+        # self.df["signal"] = (self.df["rsi"] < self.buy_threshold).astype(int)
 
     def filter_signal(self):
         self.df["signal_count"] = (
@@ -79,8 +80,8 @@ class TARSI(Contrarian):
 
     def show_signal(self, save=False):
         _, ax = plt.subplots(3, 1, figsize=(18, 10), sharex=True)
-        ax[0].plot(self.df["close"])
-        ax[1].plot(self.df["rsi"])
+        self.df[["close"]].plot(ax=ax[0])
+        self.df[["rsi"]].plot(ax=ax[1])
 
         ax[1].axhline(self.buy_threshold, color="red", linestyle=":")
         ax[0].plot(self.long_df["close"], linestyle="None", marker="^")
@@ -95,7 +96,7 @@ class TARSI(Contrarian):
         plt.xlim(0, len(self.df) - 1)
         plt.tight_layout()
         if save:
-            plt.savefig(f"./figures/RSI_{self.underlying}.png", dpi=500)
+            plt.savefig(f"./figures/RSI_{self.current_underlying}.png", dpi=500)
 
     def show_profit_and_loss(self, save=False):
         _, ax = plt.subplots(2, 1, figsize=(18, 10), sharex=True)
@@ -105,20 +106,44 @@ class TARSI(Contrarian):
         ax[1].axhline(self.buy_threshold, color="red", linestyle=":")
         plt.tight_layout()
         if save:
-            plt.savefig(f"./figures/RSI_{self.underlying}_hit_ratio.png", dpi=500)
+            plt.savefig(
+                f"./figures/RSI_{self.current_underlying}_hit_ratio.png", dpi=500
+            )
 
-    def backtest(self):
+    def backtest(self, underlying="510300"):
         if not getattr(self, "buy_threshold", None):
-            print("buy_threshold 使用默认参数：20")
-            self.buy_threshold = 5
+            print("buy_threshold 使用默认参数：30")
+            self.buy_threshold = 30
         if not getattr(self, "hold_days", None):
             print("hold_days 使用默认参数：10")
             self.hold_days = 10
         if not getattr(self, "timeperiod", None):
-            print("timeperiod 使用默认参数：5")
-            self.timeperiod = 5
-        self.load_data()
+            print("timeperiod 使用默认参数：14")
+            self.timeperiod = 14
+        self.load_data(underlying=underlying)
         self.filter_signal()
         self.calculate_returns()
         self.show_signal(save=True)
         self.show_profit_and_loss(save=True)
+
+    def backtest_divergences(self):
+        """回测 RSI 背离
+
+        - 牛市背离发出买入信号。当价格创出新低，而 RSI 指数的底部比其前一次下跌的底部要高。一旦RSI 从第二次底部开始上扬，马上可以买进并且在近期底部的价格最低点的下方设置保护性止损单。如果 RSI 指数的第一次底部低于下参考线，而第二次底部高于下参考线，那么这就是一个非常强烈的买入信号。
+        - 熊市背离发出卖出信号。当价格上涨创出新高，但是 RSI 的顶部却低于其前一次上涨的顶部的时候。一旦 RSI 从第二次顶部下跌就马上可以卖空，同时在最近的新高价上方设置保护性止损单。如果第一次 RSI 顶部超过了上参考线而第二次的顶部低于上参考线，那么卖出的信号就非常强烈。
+        """
+        raise NotImplementedError
+
+    def backtest_rsi_level(self):
+        """回测 RSI 水平
+
+        - 当 RSI 击穿其下参考线，又回升到下参考线上方时买入。（仅实现这个）
+        - 当 RSI 上升到上参考线上方，又回落到上参考线下方时卖出。
+        """
+        pass
+
+
+if __name__ == "__main__":
+    rsi = TARSI()
+    rsi.set_parameters(buy_threshold=25)
+    rsi.backtest(underlying="510300")
