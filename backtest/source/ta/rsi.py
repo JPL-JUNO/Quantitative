@@ -13,16 +13,19 @@ from pandas.api.indexers import FixedForwardWindowIndexer
 from talib import RSI
 import matplotlib.pyplot as plt
 from source.contrarian import Contrarian
+from pathlib import Path
 
 plt.rcParams["figure.dpi"] = 300
+plt.rcParams["figure.figsize"] = (18, 10)
 plt.style.use("ggplot")
 
 
 class TARSI(Contrarian):
-    def __init__(self) -> None:
+    def __init__(self, buy_threshold=30, hold_days=10, timeperiod=14) -> None:
         super().__init__()
+        self.set_parameters(buy_threshold, hold_days, timeperiod)
 
-    def set_parameters(self, buy_threshold=30, hold_days=10, timeperiod=14):
+    def set_parameters(self, buy_threshold, hold_days, timeperiod):
         self.hold_days = hold_days
         self.buy_threshold = buy_threshold
         self.timeperiod = timeperiod
@@ -146,7 +149,41 @@ class TARSI(Contrarian):
         - 牛市背离发出买入信号。当价格创出新低，而 RSI 指数的底部比其前一次下跌的底部要高。一旦RSI 从第二次底部开始上扬，马上可以买进并且在近期底部的价格最低点的下方设置保护性止损单。如果 RSI 指数的第一次底部低于下参考线，而第二次底部高于下参考线，那么这就是一个非常强烈的买入信号。
         - 熊市背离发出卖出信号。当价格上涨创出新高，但是 RSI 的顶部却低于其前一次上涨的顶部的时候。一旦 RSI 从第二次顶部下跌就马上可以卖空，同时在最近的新高价上方设置保护性止损单。如果第一次 RSI 顶部超过了上参考线而第二次的顶部低于上参考线，那么卖出的信号就非常强烈。
         """
-        raise NotImplementedError
+        self.indicator = (
+            self.data[["date", "close", "return", "rsi"]]
+            .dropna()
+            .reset_index(drop=True)
+            .copy()
+        )
+        self.indicator["close_reach_low"] = (
+            self.indicator["close"].rolling(window=60).min()
+        )
+        self.indicator["rsi_reach_low"] = self.indicator["rsi"].rolling(window=60).min()
+        self.indicator["signal"] = np.where(
+            (self.indicator["close"] == self.indicator["close_reach_low"])
+            & (self.indicator["rsi"] > self.indicator["rsi_reach_low"]),
+            1,
+            0,
+        )
+        # 统计持股期间的收益
+        self.stats_returns()
+        self.indicator.reset_index(drop=True, inplace=True)
+        self.compare_return()
+        self.get_long_data()
+        self.plot_results("./figures/rsi/divergences")
+        self.stats_hit_ratio("./figures/rsi/divergences/hit_ratios")
+
+    def stats_returns(self):
+        self.indicator["signal_return"] = (
+            self.indicator["return"]
+            .shift(-1)
+            .rolling(FixedForwardWindowIndexer(window_size=self.hold_days))
+        ).sum()  # 会在最后产生 self.hold_days 的缺失值
+        self.indicator.dropna(inplace=True)
+
+    def get_long_data(self):
+        self.long_indices = np.where(self.indicator["signal"] == 1)[0]
+        self.long_df = self.indicator.iloc[self.long_indices]
 
     def backtest_rsi_level(self):
         """回测 RSI 水平
@@ -179,7 +216,9 @@ class TARSI(Contrarian):
             self.indicator["strategy"].cumsum().apply(np.exp)
         )
 
-    def plot_results(self):
+    def plot_results(self, figure_dir):
+        figure_folder = Path(figure_dir)
+        figure_folder.mkdir(parents=True, exist_ok=True)
         fig, axes = plt.subplots(2, 1, figsize=(18, 10))
         self.indicator[["close"]].plot(ax=axes[0])
         self.indicator[["cum_strategy"]].plot(ax=axes[1])
@@ -188,29 +227,37 @@ class TARSI(Contrarian):
         )
         plt.tight_layout()
         plt.savefig(
-            f"./figures/rsi/{self.current_underlying}_{self.buy_threshold}_{self.hold_days}.png"
+            figure_folder
+            / f"{self.current_underlying}_{self.buy_threshold}_{self.hold_days}.png"
         )
+        plt.close("all")
 
-    def stats_hit_ratio(self):
-        long_df = self.indicator.loc[self.long_indices]
-        hits = (long_df["signal_return"] > 0).cumsum()
-        row_counts = pd.Series(range(1, len(long_df) + 1), index=long_df.index)
+    def stats_hit_ratio(self, figure_dir):
+        figure_folder = Path(figure_dir)
+        figure_folder.mkdir(parents=True, exist_ok=True)
+        hits = (self.long_df["signal_return"] > 0).cumsum()
+        row_counts = pd.Series(
+            range(1, len(self.long_df) + 1), index=self.long_df.index
+        )
         self.hit_ratios = hits.div(row_counts, axis=0)
         fig, axes = plt.subplots(2, 1, figsize=(18, 10))
         axes[0].plot(self.hit_ratios, linestyle="None", marker="+")
-        long_df["signal_return"].plot(ax=axes[1], kind="bar")
+        self.long_df["signal_return"].plot(ax=axes[1], kind="bar")
         plt.tight_layout()
         plt.savefig(
-            f"./figures/rsi/hit_ratios/{self.current_underlying}_{self.buy_threshold}_{self.hold_days}.png"
+            figure_folder
+            / f"{self.current_underlying}_{self.buy_threshold}_{self.hold_days}.png"
         )
+        plt.close("all")
 
 
 if __name__ == "__main__":
     rsi = TARSI()
-
-    rsi.set_parameters(buy_threshold=30, hold_days=10)
-    rsi.load_data(underlying="601138")
-    rsi.backtest_rsi_level()
-    rsi.plot_results()
-    rsi.stats_hit_ratio()
+    rsi.load_data(underlying="510050")
+    rsi.backtest_divergences()
+    # rsi.set_parameters(buy_threshold=30, hold_days=10)
+    # rsi.load_data(underlying="601138")
+    # rsi.backtest_rsi_level()
+    # rsi.plot_results()
+    # rsi.stats_hit_ratio()
     # rsi.backtest(underlying="510300")
