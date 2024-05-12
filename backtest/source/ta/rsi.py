@@ -14,26 +14,40 @@ from talib import RSI
 import matplotlib.pyplot as plt
 from source.contrarian import Contrarian
 
+plt.rcParams["figure.dpi"] = 300
+plt.style.use("ggplot")
+
 
 class TARSI(Contrarian):
     def __init__(self) -> None:
         super().__init__()
 
-    def set_parameters(self, buy_threshold, hold_days=10, timeperiod=14):
+    def set_parameters(self, buy_threshold=30, hold_days=10, timeperiod=14):
         self.hold_days = hold_days
         self.buy_threshold = buy_threshold
         self.timeperiod = timeperiod
 
     def load_data(self, underlying):
         self.current_underlying = underlying
-        self.df = pd.read_csv(
+        raw = pd.read_csv(
             f"./data/{underlying}.csv", parse_dates=["date"], thousands=","
         )
+        self.df = raw.copy()
         self.df["returns"] = self.df["close"].apply(np.log).diff()
         rsi = RSI(self.df["close"], self.timeperiod)
         self.df["rsi"] = rsi
         self.df["signal"] = np.where(self.df["rsi"] < self.buy_threshold, 1, 0)
         # self.df["signal"] = (self.df["rsi"] < self.buy_threshold).astype(int)
+
+        raw["return"] = raw["close"].apply(np.log).diff()
+        raw["signal_return"] = (
+            raw["return"]
+            .shift(-1)
+            .rolling(FixedForwardWindowIndexer(window_size=self.hold_days))
+            .sum()
+        )
+        raw["rsi"] = RSI(raw["close"], self.timeperiod)
+        self.data = raw.copy()
 
     def filter_signal(self):
         self.df["signal_count"] = (
@@ -140,10 +154,63 @@ class TARSI(Contrarian):
         - 当 RSI 击穿其下参考线，又回升到下参考线上方时买入。（仅实现这个）
         - 当 RSI 上升到上参考线上方，又回落到上参考线下方时卖出。
         """
-        pass
+        self.indicator = self.data.copy()
+        self.indicator["signal"] = np.where(
+            (self.df["rsi"].shift(periods=1) < self.buy_threshold)
+            & (self.df["rsi"] > self.buy_threshold),
+            1,
+            0,
+        )
+        self.indicator.dropna(inplace=True)
+        self.indicator.reset_index(drop=True, inplace=True)
+        # 获取做多的索引
+        self.long_indices = np.where(self.indicator["signal"] == 1)[0]
+
+        self.compare_return()
+
+    def compare_return(self):
+        """比较策略的收益与买入并持有的收益"""
+        self.indicator["strategy"] = (
+            self.indicator["signal_return"] * self.indicator["signal"]
+        )
+
+        self.indicator["cum_bh"] = self.indicator["return"].cumsum().apply(np.exp)
+        self.indicator["cum_strategy"] = (
+            self.indicator["strategy"].cumsum().apply(np.exp)
+        )
+
+    def plot_results(self):
+        fig, axes = plt.subplots(2, 1, figsize=(18, 10))
+        self.indicator[["close"]].plot(ax=axes[0])
+        self.indicator[["cum_strategy"]].plot(ax=axes[1])
+        axes[0].plot(
+            self.indicator.loc[self.long_indices, "close"], marker="^", linestyle="None"
+        )
+        plt.tight_layout()
+        plt.savefig(
+            f"./figures/rsi/{self.current_underlying}_{self.buy_threshold}_{self.hold_days}.png"
+        )
+
+    def stats_hit_ratio(self):
+        long_df = self.indicator.loc[self.long_indices]
+        hits = (long_df["signal_return"] > 0).cumsum()
+        row_counts = pd.Series(range(1, len(long_df) + 1), index=long_df.index)
+        self.hit_ratios = hits.div(row_counts, axis=0)
+        fig, axes = plt.subplots(2, 1, figsize=(18, 10))
+        axes[0].plot(self.hit_ratios, linestyle="None", marker="+")
+        long_df["signal_return"].plot(ax=axes[1], kind="bar")
+        plt.tight_layout()
+        plt.savefig(
+            f"./figures/rsi/hit_ratios/{self.current_underlying}_{self.buy_threshold}_{self.hold_days}.png"
+        )
 
 
 if __name__ == "__main__":
     rsi = TARSI()
-    rsi.set_parameters(buy_threshold=25)
-    rsi.backtest(underlying="510300")
+
+    rsi.set_parameters(buy_threshold=30, hold_days=10)
+    rsi.load_data(underlying="601138")
+    rsi.backtest_rsi_level()
+    rsi.plot_results()
+    rsi.stats_hit_ratio()
+    # rsi.backtest(underlying="510300")
