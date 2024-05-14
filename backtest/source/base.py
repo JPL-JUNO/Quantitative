@@ -14,6 +14,7 @@ from talib import SMA, MACD
 from configparser import ConfigParser
 import logging
 from datetime import date
+from pathlib import Path
 
 plt.rcParams["figure.figsize"] = (18, 10)
 
