@@ -1,0 +1,16 @@
+\chapter{经典反转模式}
+\section{The Hammer Pattern}
+从技术上讲，锤子形态只是四种不同（但相似）烛台图形的一个名称，即流星、上吊线、锤子和倒锤子。
+
+看涨锤子线是具有长下影线但没有上影线的看涨 K 线。看跌锤子线是具有长上影线且没有下影线的看跌 K 线。
+\figures{fig6-28}{A bullish Hammer}
+
+对于连续的三根 K 线 $K1, K2, K3$，满足以下条件：
+\begin{enumerate}
+    \item $K1_c < K1_o$
+    \item $(K2_c=K2_h) \land (K2_c > K2_o) \land ((K2_c-K2_o)<body) \land ((K2_o-K2_l)>2*wick)$
+    \item $K3_c>K3_o$
+\end{enumerate}
+\begin{tcolorbox}[title=警告！,colframe=red!80!black]
+    这个模式的出现次数太少，主要是 $(K2_c=K2_h)$ 太难满足。可以改进这个条件，允许存在一定的上影线。
+\end{tcolorbox}
