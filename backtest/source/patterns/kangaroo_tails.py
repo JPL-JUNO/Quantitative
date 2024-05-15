@@ -62,12 +62,10 @@ class KangarooTails(PatternBase):
 
 if __name__ == "__main__":
     kt = KangarooTails()
-    for underlying in tqdm(["159985", "159980", "515220", "510880"]):
-        kt.load_data(underlying=underlying)
-        for forward_day in tqdm(range(2, 10)):
-            kt.signal_logic()
-            kt.forward_returns(forward_days=forward_day)
-            kt.compare_returns()
-            # kt.indicator["cum_strategy"].plot()
-            kt.plot_results()
+    kt.load_data(underlying="510300")
+    kt.signal_logic()
+    kt.forward_returns(forward_days=5)
+    kt.compare_returns()
+    # kt.indicator["cum_strategy"].plot()
+    kt.plot_results()
     # kt.hit_ratios()

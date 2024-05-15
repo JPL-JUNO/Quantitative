@@ -15,6 +15,7 @@ from configparser import ConfigParser
 import logging
 from datetime import date
 from pathlib import Path
+from pandas.api.indexers import FixedForwardWindowIndexer
 
 plt.rcParams["figure.figsize"] = (18, 10)
 
@@ -43,9 +44,20 @@ class PatternBase:
     def daily_returns(self):
         self.indicator["return"] = self.indicator["close"].apply(np.log).diff()
 
-    def compare_returns(self):
+    def forward_returns(self, forward_days: int = 5):
+        self.forward_days = forward_days
+        self.daily_returns()
+        self.indicator["forward_returns"] = (
+            self.indicator["return"]
+            .shift(-1)
+            .rolling(FixedForwardWindowIndexer(window_size=forward_days))
+            .sum()
+        )
+
         self.indicator.dropna(inplace=True)
-        self.indicator.reset_index(inplace=True)
+        self.indicator.reset_index(drop=True, inplace=True)
+
+    def compare_returns(self):
         self.indicator["strategy"] = (
             self.indicator["forward_returns"] * self.indicator["signal"]
         )
