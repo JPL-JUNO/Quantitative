@@ -1,0 +1,28 @@
+\usepackage{tcolorbox}
+\usepackage{ctex}
+\newcommand\figures[2]{
+    \begin{figure}
+        \centering
+        \includegraphics{../img/#1.png}
+        \caption{#2}
+        \label{#1}
+    \end{figure}
+}
+\usepackage{mathptmx}
+\usepackage{xcolor}
+\definecolor{SWJTU}{HTML}{025483}
+\usepackage[
+    top=1.23in,
+    bottom=1in,
+    right=1in,
+    left=1in]
+{geometry}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=SWJTU,
+    filecolor=SWJTU,
+    urlcolor=SWJTU,
+    citecolor=SWJTU,
+}

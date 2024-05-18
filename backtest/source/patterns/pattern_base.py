@@ -57,13 +57,18 @@ class PatternBase:
         self.indicator.dropna(inplace=True)
         self.indicator.reset_index(drop=True, inplace=True)
 
-    def compare_returns(self):
+    def compare_returns(self) -> tuple[float, float]:
         self.indicator["strategy"] = (
             self.indicator["forward_returns"] * self.indicator["signal"]
         )
         self.indicator["cum_bh"] = self.indicator["return"].cumsum().apply(np.exp)
         self.indicator["cum_strategy"] = (
             self.indicator["strategy"].cumsum().apply(np.exp)
+        )
+
+        return (
+            self.indicator["cum_strategy"].iloc[-1],
+            self.indicator["cum_bh"].iloc[-1],
         )
 
     def plot_results(self):
@@ -83,7 +88,7 @@ class PatternBase:
         )
         plt.close("all")
 
-    def hit_ratios(self):
+    def hit_ratios(self) -> tuple[float, float]:
         long_indices = np.where(self.indicator["signal"] == 1)[0]
         self.long_df = self.indicator.loc[long_indices].reset_index(drop=True)
         self.long_df["hit_ratio"] = (
@@ -95,3 +100,4 @@ class PatternBase:
         plt.tight_layout()
         plt.savefig(self.results_path / f"hit_ratio_{self.current_underlying}.png")
         plt.close("all")
+        return self.long_df["hit_ratio"].iloc[-1], len(long_indices)

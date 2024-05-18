@@ -1,5 +1,9 @@
-\chapter{经典反转模式}
-\section{The Doji Pattern}
+\documentclass{article}
+\include{../preamble}
+\title{The Doji Pattern}
+\begin{document}
+
+\section*{The Doji Pattern}
 \textit{doji} 这个词在日语中的意思是“错误”，这是合乎逻辑的，因为交易者将其标记为犹豫不决的模式。
 
 \figures{fig6-2}{A bullish Doji}
@@ -20,23 +24,10 @@
 \subsection*{The Double Doji}
 可能会看到多个连续的十字星形态。连续的两个十字星形态意味着长期的犹豫不决，并且由于反向交易者仍在犹豫并努力迫使市场走自己的路，因此反转的信念可能会降低。\textbf{一般来说，两个十字星形态并不比一个十字星形态更有价值}。
 \subsection*{The Tri Star Doji}
-它的特点是具有三个十字星图案，其中中间的一个与另外两个之间存在间隙。
+% 它的特点是具有三个十字星图案，其中中间的一个与另外两个之间存在间隙。
 
 十字星形态并不完美，因为它可能会出现多次，但随后市场却没有反应。这是因为开盘价和收盘价之间的平衡并不一定意味着预期买卖活动的平衡。
 
 十字星形态是一种常见结构，但本质上通常不具有预测性。\textbf{在依靠十字星模式进行未来反应之前，必须先定义当前的市场状况}。例如，在看涨趋势市场中，看跌十字星模式不太可能提供质量信号，但在横盘市场中，功效会增加（记住看不见的手）。
-\section{The Hammer Pattern}
-从技术上讲，锤子形态只是四种不同（但相似）烛台图形的一个名称，即流星、上吊线、锤子和倒锤子。
-
-看涨锤子线是具有长下影线但没有上影线的看涨 K 线。看跌锤子线是具有长上影线且没有下影线的看跌 K 线。
-\figures{fig6-28}{A bullish Hammer}
-
-对于连续的三根 K 线 $K1, K2, K3$，满足以下条件：
-\begin{enumerate}
-    \item $K1_c < K1_o$
-    \item $(K2_c=K2_h) \land (K2_c > K2_o) \land ((K2_c-K2_o)<body) \land ((K2_o-K2_l)>2*wick)$
-    \item $K3_c>K3_o$
-\end{enumerate}
-\begin{tcolorbox}[title=警告！,colframe=red!80!black]
-    这个模式的出现次数太少，主要是 $(K2_c=K2_h)$ 太难满足。可以改进这个条件，允许存在一定的上影线。
-\end{tcolorbox}
+\section*{回测结果}
+\end{document}

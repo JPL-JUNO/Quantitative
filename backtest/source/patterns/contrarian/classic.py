@@ -25,6 +25,24 @@ sys.path.append(path.join(path.dirname(__file__), "../../../"))
 from source.patterns.pattern_base import PatternBase
 
 
+class Doji(PatternBase):
+    def signal_logic(self):
+        self.indicator = self.data.copy()
+        grp = self.indicator.rolling(window=2)
+        signal = pd.Series(np.zeros(len(self.indicator)), dtype=int)
+        for idx, data in enumerate(grp):
+            if idx < 1:
+                continue
+            data = data.reset_index(drop=True).T.to_dict()
+            k1, k2 = data[0], data[1]
+            if k2["close"] != k2["open"]:
+                continue
+            mask1 = k1["close"] < k1["open"]
+            if mask1:
+                signal[idx] = 1
+        self.indicator["signal"] = signal
+
+
 class Hammer(PatternBase):
     def __init__(self):
         super().__init__()
@@ -52,8 +70,15 @@ class Hammer(PatternBase):
 
 
 if __name__ == "__main__":
-    hammer = Hammer()
-    hammer.load_data(underlying="603619")
-    hammer.signal_logic()
-    hammer.forward_returns()
-    print(hammer.indicator.signal.value_counts())
+    doji = Doji()
+    doji.load_data(underlying="159985")
+    doji.signal_logic()
+    doji.forward_returns()
+    doji.compare_returns()
+    doji.plot_results()
+    # pass
+    # hammer = Hammer()
+    # hammer.load_data(underlying="603619")
+    # hammer.signal_logic()
+    # hammer.forward_returns()
+    # print(hammer.indicator.signal.value_counts())
