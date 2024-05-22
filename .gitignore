@@ -33,3 +33,4 @@ backtest/data/*.csv
 backtest/figures
 *.h5
 *.h5ts
+Strategy
