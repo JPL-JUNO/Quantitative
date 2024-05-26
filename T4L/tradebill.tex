@@ -1,0 +1,37 @@
+\documentclass{article}
+\usepackage{ctex}
+\usepackage{tabularx}
+\usepackage{caption}
+\usepackage[right=.5in,
+left=.5in]{geometry}
+\begin{document}
+\begin{table}[!ht]
+    \centering
+    \caption{交易表}
+    \begin{tabularx}{\textwidth}{|X|l|l|X|r|X|ll|}
+        \hline
+        方向               & 模式特征图  & 代码    & 下一财报日       & 下一分红日 & 日期        & ~ & ~ \\ \hline
+        ~                & ~      & ~     & ~           & ~     & ~         & ~ & ~ \\ \hline
+        ~                & ~      & ~     & ~           & ~     & ~         & ~ & ~ \\ \hline
+        ~                & 0      & 1     & 2           & 分数    & ~         & ~ & ~ \\ \hline
+        强力系统周线图          & 绿色     & 红色    & 蓝色（紧跟在绿色之后） & ~     & ~         & ~ & ~ \\ \hline
+        强力系统日线图          & 绿色     & 红色    & 蓝色（紧跟在绿色之后） & ~     & ~         & ~ & ~ \\ \hline
+        日线价格             & 高于其价值  & 在价值区间 & 低于其价值       & ~     & ~         & ~ & ~ \\ \hline
+        假突破              & 没有     & 已经发生  & 很有可能将要发生    & ~     & ~         & ~ & ~ \\ \hline
+        完备性              & 没有周期符合 & 有一个符合 & 两个符合        & ~     & 是否是 A 级交易 & ~ & ~ \\ \hline
+        ~                & ~      & ~     & 汇总          & ~     & ~         & ~ & ~ \\ \hline
+        ~                & ~      & ~     & ~           & ~     & ~         & ~ & ~ \\ \hline
+        尖峰反弹？            & ~      & 风险    & ~           & ~     & 卖出价       & ~ & ~ \\ \hline
+        大于均线？            & ~      & ~     & ~           & 买入价   & ~         & ~ & ~ \\ \hline
+        卖空               & ~      & 规模    & ~           & ~     & 止损价       & ~ & ~ \\ \hline
+        卖空覆盖天数           & ~      & ~     & ~           & ~     & ~         & ~ & ~ \\ \hline
+        简评               & ~      & ~     & ~           & ~     & ~         & ~ & ~ \\ \hline
+        ~                & ~      & ~     & ~           & ~     & ~         & ~ & ~ \\ \hline
+        \textbf{交易之后}    & ~      & ~     & ~           & ~     & ~         & ~ & ~ \\ \hline
+        A 级盈利目标（通道线30\%） & ~      & ~     & ~           & 止损订单  & ~         & ~ & ~ \\ \hline
+        软止损              & ~      & ~     & ~           & 止盈订单  & ~         & ~ & ~ \\ \hline
+        硬止损              & ~      & ~     & ~           & ~     & ~         & ~ & ~ \\ \hline
+        移动至盈亏平衡点         & ~      & ~     & ~           & ~     & ~         & ~ & ~ \\ \hline
+    \end{tabularx}
+\end{table}
+\end{document}
