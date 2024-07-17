@@ -1,0 +1,40 @@
+\chapter{量化股票组合管理的基本模型}
+\begin{table}
+    \begin{threeparttable}
+
+        \centering
+        \caption{量化股票组合管理的基本模型如何确定股票的期望收益率与风险}
+        \begin{tabular}{lll}
+            \hline
+                          & 基本面因子模型                   & 经济因子模型                    \\
+            因子暴露($\beta$) & 可直接观察到                    & 通过时间序列回归来估计               \\
+            因子溢价($f$)     & 通过截面回归来估计                 & 可直接观察到\tnote{1}           \\
+            期望收益率         & 因子暴露$\times$因子溢价          & 因子暴露$\times$因子溢价          \\
+            风险            & 因子暴露$\times$因子溢价风险$+$特定风险 & 因子暴露$\times$因子溢价风险$+$特定风险 \\
+            \hline
+        \end{tabular}
+        \begin{tablenotes}
+            \footnotesize
+            \item[1] 占一定比例的因子溢价可直接观察到。取决于所使用的因子，因子溢价可以通过构建零投资组合或主成分分析来确定
+        \end{tablenotes}
+    \end{threeparttable}
+\end{table}
+\section{基本模型的等价}
+\begin{lemma}
+    如果股票的期望收益率是基本因子暴露的线性函数，那么基本面因子模型与经济因子模型等价。
+\end{lemma}
+\section{选择正确的模型}
+\begin{table}
+    \centering\caption{选择正确模型的标准}
+    \begin{tabular}{lll}
+        \hline
+        标准     & 基本面因子模型 & 经济因子模型 \\
+        \hline
+        理论基础   &         & 更好     \\
+        因子的适用性 &         & 更好     \\
+        易于实现   & 更好      &        \\
+        数据要求   & 更好      &        \\
+        直观吸引力  & 视情况而定   & 视情况而定  \\
+        \hline
+    \end{tabular}
+\end{table}
