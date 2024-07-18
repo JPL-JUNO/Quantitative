@@ -1,0 +1,37 @@
+\chapter{用技术分析解读市场}
+\section{根据基本技术分析创建交易信号}
+\subsection{指数移动平均线}
+因此，我们根据旧 EMA 值和新的价格观测值得到以下两个新 EMA 值的公式，它们是相同的定义，以两种不同的形式写出：
+$$EMA=(P-EMA_{old})\times\mu+EMA_{old}$$
+或者，我们有以下内容：
+$$EMA=P\times\mu+(1-\mu)\times EMA_{old}$$
+
+$\mu$ 平滑常数，最常设置为 $\frac{2}{(N+1)}$。
+\subsection{绝对价格震荡指标}
+绝对价格振荡指标（我们将其称为 APO）是一类建立在价格移动平均线基础上的指标，用于捕捉价格的特定短期偏差。
+
+绝对价格振荡指标是通过计算快速指数移动平均线和慢速指数移动平均线之间的差值来计算的。直观地讲，它试图衡量反应性更强的 $EMA_{fast}$ 与稳定性更强的 $EMA_{slow}$ 之间的偏差有多大。较大的差异通常被解释为以下两种情况之一：工具价格开始呈现趋势或突破，或者工具价格远离其均衡价格，换句话说，超买或超卖：
+
+$$Absolute~price~oscillator=EMA_{fast}-EMA_{slow}$$
+
+当价格迅速偏离长期 EMA（突破）时，上述代码会生成具有较高正值和负值的 APO 值，这可能具有趋势启动解释或超买/超卖解释。
+
+\figures{apo}{这里的一个观察结果是快速和慢速 EMA 之间的行为差异。较快的 EMA 对新的价格观察更具反应性，而较慢的 EMA 对新的价格观察反应较弱且衰减较慢。当价格向上突破时，APO 值为正，APO 值的幅度捕捉突破的幅度。当价格向下突破时，APO 值为负，APO 值的幅度捕捉突破的幅度。}
+\subsection{移动平均线收敛发散}
+移动平均线收敛发散是另一种基于价格移动平均线的指标。我们将其称为 MACD。它比 APO 更进了一步。它在本质上与绝对价格震荡指标类似，因为它确定了快速指数移动平均线和慢速指数移动平均线之间的差异。然而，在 MACD 的情况下，我们将平滑指数移动平均线应用于 MACD 值本身，以便从 MACD 指标获得最终信号输出。或者，您也可以查看 MACD 值与 MACD 值的 EMA（信号）之间的差异，并将其可视化为直方图。正确配置的 MACD 信号可以成功捕捉趋势工具价格的方向、幅度和持续时间：
+\begin{equation}
+    \begin{aligned}
+        MACD             & =EMA_{fast}-EMA_{slow} \\
+        MACD_{signal}    & =EMA_{MACS}            \\
+        MACD_{histogram} & =MACD-MACD_{signal}    \\
+    \end{aligned}
+\end{equation}
+\subsection{布林线}
+\begin{equation}
+    \begin{aligned}
+        BBAND_{middle} & =SMA_{n-periods}            \\
+        BBAND_{Upper}  & =BBAND_{middle}+\beta\delta \\
+        BBAND_{Lower}  & =BBAND_{middle}-\beta\delta \\
+    \end{aligned}
+\end{equation}
+\subsection{相对强弱指标}
