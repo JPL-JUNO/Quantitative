@@ -1,0 +1,35 @@
+\chapter{金融数据及其特征}
+\section{资产收益率}
+大多数金融研究都是针对资产收益率，而不是资产价格. Campbell 等（1997）给出了使用资产收益率的两个主要原因. 首先，对于一个普通的投资者来说，资产收益率代表一个完全的、尺度自由的投资机会的总结和概括. 其次，资产收益率序列比价格序列更容易处理，前者有更好的统计特性. 然而，资产收益率有多种不同的定义.
+\subsection*{单期简单收益率}
+假设投资者在一个周期内拥有某种资产，从第 $t-1$ 天到第 $t$ 天，其简单毛收益率为：
+$$1+R_t=\frac{P_t}{P_{t-1}} ~\text{or} ~P_t=P_{t-1}(1+R_t)$$
+
+相对应的单期简单净收益率 （simple net return）或简单收益率（simple return）为：
+\begin{equation}
+    R_t=\frac{P_t}{P_{t-1}}-1=\frac{P_t-P_{t-1}}{P_{t-1}}
+\end{equation}
+
+\subsection*{多期简单收益率}
+假设从第 $t-k$ 天到第 $t$ 天，这 $k$ 个周期内持有某种资产，则 $k$ 期简单毛收益率为：
+\begin{equation}
+    \begin{aligned}
+        1+R_t[k] & =\frac{P_t}{P_{t-1}}=\frac{P_t}{P_{t-1}}\times\frac{P_{t-1}}{P_{t-2}}\times\cdots\times\frac{P_{t-k+1}}{P_{t-k}} \\
+                 & =(1+R_t)(1+R_{t-1})\cdots(1+R_{t-k+1})                                                                           \\
+                 & =\prod_{j=0}^{k-1}(1+R_{t-j})
+    \end{aligned}
+\end{equation}
+这样，$k$ 期简单毛收益率是其包含的这 $k$ 个单期简单毛收益率的乘积，称为复合收益率 （compound return）. $k$ 期简单净收益率为 $R_t[k]=(P_t -P_{t-k})/P_{t-k}$.
+
+在实际中，确切的时间区间对讨论和比较收益率是非常重要的（例如月收益率还是年收益率）. 若时间区间没有给出，这里隐含的假定时间区间为一年. 如果持有资产的期限为 $k$ 年，则（平均）年度化收益率定义为
+$$\text{年化}R_t[k]=\left[\prod_{j=0}^{k-1}(1+R_{t-j})\right]^{1/k}-1$$
+
+这是由它所包含的 $k$ 个单期简单毛收益率几何平均得到的，可用下式计算：
+$$\text{年化}R_t[k]=\exp\left[\frac{1}{k}\sum_{j=0}^{k-1}(1+R_{t-j})\right]-1$$
+
+因为算术平均值比几何平均值计算起来容易，并且单期收益率一般很小，所以我们可用一阶泰勒（Taylor）展开来近似表示年度化的收益率，则有
+\begin{equation}
+    \label{eq1-3}
+    \text{年化}R_t[k]\approx\frac{1}{k}\sum_{j=0}^{k-1}R_{t-j}
+\end{equation}
+然而，在有些应用中，\autoref{eq1-3} 的近似精确度可能不够.

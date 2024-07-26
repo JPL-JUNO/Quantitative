@@ -26,7 +26,7 @@ $$Absolute~price~oscillator=EMA_{fast}-EMA_{slow}$$
         MACD_{histogram} & =MACD-MACD_{signal}    \\
     \end{aligned}
 \end{equation}
-\subsection{布林线}
+\subsection{布林线}
 \begin{equation}
     \begin{aligned}
         BBAND_{middle} & =SMA_{n-periods}            \\
@@ -35,3 +35,10 @@ $$Absolute~price~oscillator=EMA_{fast}-EMA_{slow}$$
     \end{aligned}
 \end{equation}
 \subsection{相对强弱指标}
+\subsection{动量}
+最简单的形式是，动量就是当前价格与过去某个固定时间段的价格之间的差值。动量值连续为正表明趋势为上升
+趋势；相反，如果动量连续为负，则表明趋势为下降趋势。通常，我们使用 MOM 指标的简单/指数移动平均线（如下
+所示）来检测持续趋势：
+\begin{equation}
+    MOM=Price_t-Price_{t-n}
+\end{equation}
