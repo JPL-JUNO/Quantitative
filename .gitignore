@@ -34,3 +34,4 @@ backtest/figures
 *.h5
 *.h5ts
 Strategy
+*.lof
